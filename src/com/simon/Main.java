@@ -89,10 +89,6 @@ public class Main{
             ui();
            setFirstListGui();
 
-            String SpotifiUser="114036704";
-            String SpotifiPlayList="2RJZP5M6B4QGHkNgsjcri7";
-            String SpotifyPlayListName="alt det gode";
-
 
           // sonos.playSpotifyPlayList(SpotifiUser,SpotifiPlayList,SpotifyPlayListName);
 
