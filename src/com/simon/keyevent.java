@@ -1,8 +1,12 @@
-package com.simon.sonos;
+package com.simon;
 
 import com.simon.Main;
+import com.simon.sonos.Sonos;
 import com.simon.ui.gui2;
+import com.simon.ui2.frame;
+import com.simon.ui2.listPanel;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
@@ -24,7 +28,7 @@ public class keyevent implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        gui2.list.ensureIndexIsVisible(gui2.list.getSelectedIndex());
+        Main.gui.listPanel.list.ensureIndexIsVisible(Main.gui.listPanel.list.getSelectedIndex());
         Sonos sonos = Main.sonos;
 
 
@@ -41,13 +45,14 @@ public class keyevent implements KeyListener {
             Main.firstListFlag =-1;
         }
         if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
-            System.out.println("index : "+gui2.list.getSelectedIndex() + " flag : "+ Main.firstListFlag);
+            System.out.println("index : "+Main.gui.listPanel.list.getSelectedIndex() + " flag : "+ Main.firstListFlag);
             switch (Main.firstListFlag){
                 case -1:
 
                     System.out.println("first list action");
-                    switch (gui2.list.getSelectedIndex()) {
+                    switch (frame.listPanel.list.getSelectedIndex()) {
                         case 0:
+
                             Main.firstListFlag =0;
                             Main.getRadioList();
                             break;
@@ -89,7 +94,7 @@ public class keyevent implements KeyListener {
                     try {
                         sonos.SetPlayListAsInput();
 
-                        sonos.Seek_track_nr(gui2.list.getSelectedIndex()+1);
+                        sonos.Seek_track_nr(Main.gui.listPanel.list.getSelectedIndex()+1);
 
                         sonos.play();
                     } catch (IOException e1) {
@@ -102,18 +107,18 @@ public class keyevent implements KeyListener {
 
 
                     try {
-                        switch ( gui2.popup(Main.gui)){
+                        switch (frame.popup(Main.gui)){
                             case 0:
                                 // add
                                 sonos.SetPlayListAsInput();
 
-                                sonos.playSpotifyPlayList(Main.activeList.get(gui2.list.getSelectedIndex()));
+                                sonos.playSpotifyPlayList(Main.activeList.get(Main.gui.listPanel.list.getSelectedIndex()));
                                 break;
                             case 1:
                                 // replace
                                 sonos.RemoveAllTracks();
                                 sonos.SetPlayListAsInput();
-                                sonos.playSpotifyPlayList(Main.activeList.get(gui2.list.getSelectedIndex()));
+                                sonos.playSpotifyPlayList(Main.activeList.get(Main.gui.listPanel.list.getSelectedIndex()));
                                 sonos.play();
                                 break;
                             case 2:

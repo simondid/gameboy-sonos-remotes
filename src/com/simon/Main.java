@@ -7,6 +7,7 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
 import com.simon.ui.gui2;
+import com.simon.ui2.frame;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +27,7 @@ public class Main{
     public static String[] firstList = {"radio","queue","Spotify","tv"};
     public static int firstListFlag = -1;
     public static Sonos sonos;
-    public static JFrame gui;
+    public static frame gui;
     public static ArrayList<item> radioStationList;
     static Spotify spotify;
     public static GpioPinDigitalInput ButtonLeft,ButtonRight,ButtonUp,ButtonDown,ButtonA,ButtonB,ButtonSelect,ButtonStart;
@@ -48,7 +49,7 @@ public class Main{
 
 
 
-    //        sonos.getTransportInfo();
+         sonos.getTransportInfo();
       //      sonos.setGroupVolume(55);
 
       //      sonos.Next();
@@ -99,7 +100,7 @@ public class Main{
         e.printStackTrace();
     }
 
-      //  System.exit(0);
+
     }
 
     private static void pi4jSetup() {
@@ -325,8 +326,9 @@ public class Main{
 
         // new FullScreenJFrame();
 
-         gui = new gui2(false);
+        // gui = new gui2(false);
 
+         gui = new frame();
     }
 
     public static void getSpotifyPlayLists(){
@@ -335,19 +337,23 @@ public class Main{
             @Override
             public synchronized void start() {
                 super.start();
+                gui.Infopanel.LoadingIconON();
                 setNewGuiList(Spotify.GetPublicPlayLists());
+                gui.Infopanel.LoadingIconOFF();
             }
         };
         t.start();
     }
     public static void getQueue() {
         setNewGuiList(queuePreBuf);
+
         Sonos s = new Sonos(ipAddress);
 
             Thread t = new Thread() {
                 @Override
                 public void run() {
                     super.run();
+                    gui.Infopanel.LoadingIconON();
                     try {
                         activeList = s.BrowseQueue(0, 0, 0);
                     } catch (IOException e) {
@@ -356,6 +362,7 @@ public class Main{
                     setNewGuiList(activeList);
                     queuePreBuf = activeList;
                     firstListFlag = 1;
+                    gui.Infopanel.LoadingIconOFF();
                 }
         };
             t.start();
@@ -380,7 +387,7 @@ public class Main{
                     newlist[i]=itemList.get(i).title;
                 }
                 activeList = itemList;
-                gui2.newList(newlist);
+                frame.newList(newlist);
 
             }
         };
@@ -389,7 +396,7 @@ public class Main{
     }
     public static void setFirstListGui() {
 
-        gui2.newList(firstList);
+        frame.newList(firstList);
     }
 
     public static void getRadioList() {

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -771,6 +772,57 @@ public class Sonos {
             oneResponse += line + "\r\n";
         }
         System.out.println(oneResponse);
+    }
+    public static class posisitionInfo{
+
+        public String Duratation,RelTime;
+
+        public posisitionInfo(String duratation, String relTime) {
+            Duratation = duratation;
+            RelTime = relTime;
+        }
+    }
+    public static posisitionInfo getPosistionInfo() throws IOException {
+        System.out.println
+                (new Exception().getStackTrace()[0].getMethodName());
+
+        URL url = new URL("http://" + ipAdress + ":1400/MediaRenderer/AVTransport/Control");
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+
+        request.setRequestMethod("POST");
+        request.addRequestProperty("SOAPACTION", "\"urn:schemas-upnp-org:service:AVTransport:1#GetPositionInfo\"");
+        request.setDoOutput(true);
+        request.setReadTimeout(500);
+
+
+        OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
+
+        input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "   <s:Body>\n" +
+                "      <u:GetPositionInfo xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\">\n" +
+                "         <InstanceID>0</InstanceID>\n" +
+                "      </u:GetPositionInfo>\n" +
+                "   </s:Body>\n" +
+                "</s:Envelope>");
+        input.write("");
+
+
+
+        input.flush();
+
+
+        BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+        String oneResponse = new String();
+        String line;
+        while ((line = output.readLine()) != null) {
+            oneResponse += line + "\r\n";
+        }
+        System.out.println(oneResponse);
+        String duratation = oneResponse.substring(oneResponse.indexOf("<TrackDuration>")+"<TrackDuration>".length(),oneResponse.indexOf("</TrackDuration>"));
+        String RelTime = oneResponse.substring(oneResponse.indexOf("<RelTime>")+"<RelTime>".length(),oneResponse.indexOf("</RelTime>"));
+        return new posisitionInfo(duratation,RelTime);
+
     }
     public void SetTvAsInput() throws IOException {
 

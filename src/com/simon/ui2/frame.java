@@ -1,25 +1,25 @@
-package com.simon.ui;
+package com.simon.ui2;
 
-import com.simon.Main;
-import com.simon.keyevent;
 
 import javax.swing.*;
 import javax.swing.plaf.ActionMapUIResource;
 import java.awt.*;
-import java.awt.event.*;
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+
+import static com.simon.ui.gui2.list;
 
 /**
- * Created by simon on 3/6/2017.
+ * Created by simon on 3/14/2017.
  */
-public class gui2 extends JFrame implements ActionListener{
+public class frame extends JFrame {
     private GraphicsDevice vc;
-
-   public static JList list;
-
-
-    public gui2 (boolean fullscreen)throws HeadlessException {
-
+    public InfoPanel Infopanel;
+    public static listPanel listPanel;
+    public frame() throws HeadlessException {
+        super("title");
+        setLayout(new BorderLayout());
         GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
         vc = e.getDefaultScreenDevice();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -27,35 +27,48 @@ public class gui2 extends JFrame implements ActionListener{
 
         //   this.setTitle("sonos app");
         this.setSize(320,240);
+        this.setPreferredSize(new Dimension(320,240));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
-        ArrayList<String> itemlist = new ArrayList<>();
-
-        for(int i = 0; i< Main.activeList.size(); i++){
-            itemlist.add(Main.activeList.get(i).title);
-        }
-        GridLayout layout = new GridLayout(2,1);
-        list = new JList(itemlist.toArray());
-        list.addKeyListener(new keyevent());
-        list.getSelectedIndex();
-
-        JLabel label = new JLabel("davs");
-        label.setFocusable(false);
-        label.setSize(this.getWidth(),10);
-       // label.set
-        layout.addLayoutComponent("label",label);
-        layout.addLayoutComponent(null,list);
-        //this.setLayout(layout);
-       // this.add(label);
-        this.add(new JScrollPane(list));
+        Container c = getContentPane();
 
 
-        if(fullscreen) {
-            setFullScreen(this);
-        }
+
+        Infopanel = new InfoPanel();
+
+        listPanel = new listPanel();
+        c.add(listPanel);
+        c.add(Infopanel,BorderLayout.NORTH);
+        c.add(listPanel);
+
+
+        this.pack();
         this.setVisible(true);
+    }
+    public static int popup(JFrame f){
+        System.out.println
+                (new Exception().getStackTrace()[0].getMethodName());
+        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
+        configureOptionPane();
+        Object[] options = {"ADD",
+                "Replace",
+                "Cancel"};
 
 
+        Object[] op = {"ADD","Replace","Cancel"};
+        int n = JOptionPane.showOptionDialog(f,
+                "what to do with playlist",
+                "play list handling",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[2]);
+
+
+
+
+        return n;
     }
     private static void configureOptionPane() {
         if(UIManager.getLookAndFeelDefaults().get("OptionPane.actionMap") == null)
@@ -102,65 +115,12 @@ public class gui2 extends JFrame implements ActionListener{
             ));
         }
     }
-
-    public static int popup(JFrame f){
-        System.out.println
-                (new Exception().getStackTrace()[0].getMethodName());
-        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
-        configureOptionPane();
-        Object[] options = {"ADD",
-                "Replace",
-                "Cancel"};
-
-
-                 Object[] op = {"ADD","Replace","Cancel"};
-        int n = JOptionPane.showOptionDialog(f,
-                "what to do with playlist",
-                "play list handling",
-                JOptionPane.YES_NO_CANCEL_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[2]);
-
-
-
-
-        return n;
-    }
-
-    public void setFullScreen(JFrame f) {
-
-        f.setUndecorated(true);
-        f.setResizable(false);
-        vc.setFullScreenWindow(f);
-
-
-
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals("Check")) {
-
-            int index = list.getSelectedIndex();
-
-            System.out.println("Index Selected: " + index);
-
-            String s = (String) list.getSelectedValue();
-
-            System.out.println("Value Selected: " + s);
-
-        }
-
-    }
-
-    public static void newList1(String[] strings) {
+    public static void newList(String[] strings) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                list.setListData(strings);
-                list.repaint();
+                listPanel.list.setListData(strings);
+                listPanel.list.repaint();
             }
         });
 
