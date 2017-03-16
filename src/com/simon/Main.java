@@ -33,6 +33,7 @@ public class Main{
     public static GpioPinDigitalInput ButtonLeft,ButtonRight,ButtonUp,ButtonDown,ButtonA,ButtonB,ButtonSelect,ButtonStart;
     static GpioController gpio;
     public static String fullscreen = "";
+    public static int debounceTime = 500;
     public static void main(String[] args){
 
 
@@ -127,7 +128,7 @@ public class Main{
     public static void pi4jButtonSelectSetup(){
         ButtonSelect = gpio.provisionDigitalInputPin(RaspiPin.GPIO_07, PinPullResistance.PULL_DOWN);
         ButtonSelect.setShutdownOptions(true);
-
+        ButtonSelect.setDebounce(debounceTime);
         ButtonSelect.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -152,7 +153,7 @@ public class Main{
     public static void pi4jButtonStartSetup(){
         ButtonStart = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, PinPullResistance.PULL_DOWN);
         ButtonStart.setShutdownOptions(true);
-
+        ButtonStart.setDebounce(debounceTime);
         ButtonStart.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -177,7 +178,7 @@ public class Main{
     public static void pi4jButtonBSetup(){
         ButtonB = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_DOWN);
         ButtonB.setShutdownOptions(true);
-
+        ButtonB.setDebounce(debounceTime);
         ButtonB.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -202,7 +203,7 @@ public class Main{
     public static void pi4jButtonASetup(){
         ButtonA = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_DOWN);
         ButtonA.setShutdownOptions(true);
-
+        ButtonA.setDebounce(debounceTime);
         ButtonA.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -227,7 +228,7 @@ public class Main{
     public static void pi4jButtonDownSetup(){
         ButtonDown = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04, PinPullResistance.PULL_DOWN);
         ButtonDown.setShutdownOptions(true);
-
+        ButtonDown.setDebounce(debounceTime);
         ButtonDown.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -252,7 +253,7 @@ public class Main{
     public static void pi4jButtonUpSetup(){
         ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, PinPullResistance.PULL_DOWN);
         ButtonUp.setShutdownOptions(true);
-
+        ButtonUp.setDebounce(debounceTime);
         ButtonUp.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -277,7 +278,7 @@ public class Main{
     public static void pi4jButtonRightSetup(){
         ButtonRight = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00, PinPullResistance.PULL_DOWN);
         ButtonRight.setShutdownOptions(true);
-
+        ButtonRight.setDebounce(debounceTime);
         ButtonRight.addListener(new GpioPinListenerDigital() {
 
             @Override
@@ -302,7 +303,7 @@ public class Main{
     public static void pi4jButtonLeftSetup(){
         ButtonLeft = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_DOWN);
         ButtonLeft.setShutdownOptions(true);
-
+        ButtonLeft.setDebounce(debounceTime);
         ButtonLeft.addListener(new GpioPinListenerDigital() {
 
             @Override
