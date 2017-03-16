@@ -44,7 +44,7 @@ public class keyevent implements KeyListener {
             Main.setFirstListGui();
             Main.firstListFlag =-1;
         }
-        if(e.getKeyCode()==KeyEvent.VK_RIGHT) {
+        if(e.getKeyCode()==KeyEvent.VK_RIGHT||e.getKeyCode()==KeyEvent.VK_ENTER) {
             System.out.println("index : "+Main.gui.listPanel.list.getSelectedIndex() + " flag : "+ Main.firstListFlag);
             switch (Main.firstListFlag){
                 case -1:
@@ -94,9 +94,11 @@ public class keyevent implements KeyListener {
                     try {
                         sonos.SetPlayListAsInput();
 
-                        sonos.Seek_track_nr(Main.gui.listPanel.list.getSelectedIndex()+1);
+                        int position = Main.gui.listPanel.list.getSelectedIndex();
+                        sonos.Seek_track_nr(position+1);
 
                         sonos.play();
+                        Main.gui.Infopanel.updatInfoPanel(Main.activeList.get(position));
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }

@@ -32,12 +32,15 @@ public class Main{
     static Spotify spotify;
     public static GpioPinDigitalInput ButtonLeft,ButtonRight,ButtonUp,ButtonDown,ButtonA,ButtonB,ButtonSelect,ButtonStart;
     static GpioController gpio;
+    public static String fullscreen = "";
     public static void main(String[] args){
+
 
         ipAddress = args[0];
         clientId = args[1];
         clientSecret = args[2];
         userid = args[3];
+        fullscreen = args[4];
 
         spotify = new Spotify(clientId,clientSecret,userid);
         sonos = new Sonos(ipAddress);
@@ -328,7 +331,7 @@ public class Main{
 
         // gui = new gui2(false);
 
-         gui = new frame();
+         gui = new frame(fullscreen);
     }
 
     public static void getSpotifyPlayLists(){

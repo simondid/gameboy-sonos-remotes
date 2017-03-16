@@ -2,7 +2,7 @@ package com.simon.ui2;
 
 import com.simon.Main;
 import com.simon.sonos.Sonos;
-import com.simon.spotify.Spotify;
+import com.simon.sonos.item;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalTime;
+import java.util.concurrent.*;
 
 /**
  * Created by simon on 3/14/2017.
@@ -22,6 +23,7 @@ public class InfoPanel extends JPanel {
     final JProgressBar pb;
     JLabel title;
     JLabel wIcon;
+    Timer t;
     public InfoPanel() {
 
         Dimension size = getPreferredSize();
@@ -89,9 +91,43 @@ public class InfoPanel extends JPanel {
         add(wIcon,gc);
 
 
-        updatInfoPanel();
 
+
+        t = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //try {
+
+
+                    //  if (Main.sonos.getTransportInfo()) {
+                    if(isPlaying){
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                pb.setValue(pb.getValue() + 1);
+                                pb.setString(LocalTime.MIN.plusSeconds(pb.getMaximum() - pb.getValue()).toString());
+                            }
+                        });
+
+                }
+                if (pb.getMaximum() == pb.getValue()) {
+                    updatInfoPanel(null);
+
+                }else{
+                    try {
+                        isPlaying = new getTransportState().call();
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+            }
+        });
+        t.start();
+        updatInfoPanel(null);
     }
+
     public int timeformatToInt(String time){
         String[] units = time.split(":"); //will break the string up into an array
         int houres = Integer.parseInt(units[0]); //first element
@@ -99,49 +135,69 @@ public class InfoPanel extends JPanel {
         int seconds = Integer.parseInt(units[2]); //second element
        return houres*3600+60 * minutes + seconds; //add up our values
     }
-    public void updatInfoPanel() {
+    volatile boolean isPlaying = true;
+    public void updatInfoPanel(item input) {
 
 
         int timeinSeckunds = 0;
         int position = 0;
+
         try {
             Sonos.posisitionInfo data = Sonos.getPosistionInfo();
-            String time = data.Duratation; //mm:ss
 
             timeinSeckunds = timeformatToInt(data.Duratation);
             position = timeformatToInt(data.RelTime);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String name="NAN";
+        if(input == null){
 
-        String name = "DAD";
+        }else {
+            name = input.title;
+        }
 
-
+        pb.setValue(position);
         pb.setMaximum(timeinSeckunds);
 
         title.setText(name);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Timer t = new Timer(1000, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        try {
-                            if (Main.sonos.getTransportInfo()) {
-                                pb.setValue(pb.getValue() + 1);
-                                pb.setString(LocalTime.MIN.plusSeconds(pb.getMaximum() - pb.getValue()).toString());
-                            }
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
 
-                    }
-                });
-                t.start();
 
-            }
-        });
+
+                CountDownLatch l = new CountDownLatch(1);
+
+
+
+
+//                Future<Boolean> task = executor.submit(new getTransportState());
+
+//                try {
+//                    if(task.isDone()) {
+//                        result[0] = task.get();
+//                    }
+//                } catch (InterruptedException e1) {
+//                    e1.printStackTrace();
+//                } catch (ExecutionException e1) {
+//                    e1.printStackTrace();
+//                }
+
+
+
+    }
+
+    class getTransportState implements Callable<Boolean> {
+
+
+        @Override
+        public Boolean call() throws Exception {
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            Sonos s = new Sonos(Main.ipAddress);
+            boolean data = s.getTransportInfo();
+            return data;
+
+
+        }
     }
     public void toggleLoadingIcon(){
         SwingUtilities.invokeLater(new Runnable() {

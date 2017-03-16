@@ -36,7 +36,7 @@ public class gui2 extends JFrame implements ActionListener{
         }
         GridLayout layout = new GridLayout(2,1);
         list = new JList(itemlist.toArray());
-        list.addKeyListener(new keyevent());
+
         list.getSelectedIndex();
 
         JLabel label = new JLabel("davs");

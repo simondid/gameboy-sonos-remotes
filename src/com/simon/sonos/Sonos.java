@@ -1160,8 +1160,8 @@ public class Sonos {
 
                     case "PLAYING":
 
-                        System.out.println(oneResponse);
-                        System.out.println(oneResponse1);
+//                        System.out.println(oneResponse);
+//                        System.out.println(oneResponse1);
 
                         return true;
                     case "PAUSED_PLAYBACK":

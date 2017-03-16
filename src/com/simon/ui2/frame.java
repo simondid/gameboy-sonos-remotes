@@ -17,16 +17,23 @@ public class frame extends JFrame {
     private GraphicsDevice vc;
     public InfoPanel Infopanel;
     public static listPanel listPanel;
-    public frame() throws HeadlessException {
-        super("title");
+    GraphicsEnvironment e;
+    public frame(String fullscreen) throws HeadlessException {
+      //  super("title");
+
+
+
+
         setLayout(new BorderLayout());
-        GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
+        e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+
         vc = e.getDefaultScreenDevice();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 
         //   this.setTitle("sonos app");
-        this.setSize(320,240);
+      // this.setSize(320,240);
         this.setPreferredSize(new Dimension(320,240));
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setResizable(false);
@@ -40,10 +47,28 @@ public class frame extends JFrame {
         c.add(listPanel);
         c.add(Infopanel,BorderLayout.NORTH);
         c.add(listPanel);
-
+        System.out.println("trigger "+fullscreen);
+        if(fullscreen.contains("true")||fullscreen.contains("1")){
+            setFullScreen(this);
+        }
 
         this.pack();
         this.setVisible(true);
+    }
+    public void setFullScreen(JFrame f) {
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setPreferredSize(new Dimension(dim.getSize()));
+        f.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        f.setUndecorated(true);
+        f.setResizable(false);
+
+        GraphicsDevice device = GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getScreenDevices()[0];
+        device.setFullScreenWindow(f);
+
+
+
     }
     public static int popup(JFrame f){
         System.out.println
