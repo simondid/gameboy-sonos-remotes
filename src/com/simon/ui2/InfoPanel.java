@@ -1,5 +1,6 @@
 package com.simon.ui2;
 
+import com.oracle.deploy.update.UpdateInfo;
 import com.simon.Main;
 import com.simon.sonos.Sonos;
 import com.simon.sonos.item;
@@ -112,11 +113,11 @@ public class InfoPanel extends JPanel {
 
                 }
                 if (pb.getMaximum() == pb.getValue()) {
-                    updatInfoPanel(null);
-
+                   // updatInfoPanel(null);
                 }else{
                     try {
                         isPlaying = new getTransportState().call();
+                        new getPositionInfo().call();
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -125,7 +126,7 @@ public class InfoPanel extends JPanel {
             }
         });
         t.start();
-        updatInfoPanel(null);
+     //   updatInfoPanel(null);
     }
 
     public int timeformatToInt(String time){
@@ -186,6 +187,28 @@ public class InfoPanel extends JPanel {
 
     }
 
+    class getPositionInfo implements Callable<Void>{
+
+        @Override
+        public Void call() throws Exception {
+            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+            Sonos s = new Sonos(Main.ipAddress);
+
+            Sonos.posisitionInfo data = s.getPosistionInfo();
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    pb.setMaximum(timeformatToInt(data.Duratation));
+                    pb.setValue(timeformatToInt(data.RelTime));
+//                    pb.setString(Main.activeList.get(data.track).title);
+                    title.setText(Main.queuePreBuf.get(data.track-1).title);
+                    updatInfoPanel(Main.queuePreBuf.get(data.track-1));
+                }
+            });
+
+            return null;
+        }
+    }
     class getTransportState implements Callable<Boolean> {
 
 
@@ -193,6 +216,7 @@ public class InfoPanel extends JPanel {
         public Boolean call() throws Exception {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
             Sonos s = new Sonos(Main.ipAddress);
+
             boolean data = s.getTransportInfo();
             return data;
 

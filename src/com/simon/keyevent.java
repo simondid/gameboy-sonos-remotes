@@ -21,6 +21,7 @@ public class keyevent implements KeyListener {
     public keyevent() {
     }
 
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -80,7 +81,7 @@ public class keyevent implements KeyListener {
                     // handling radio stations
                     try {
 
-                        int i = sonos.playUri(Main.activeList.get(gui2.list.getSelectedIndex()));
+                        int i = sonos.playUri(Main.activeList.get(Main.gui.listPanel.list.getSelectedIndex()));
                         System.out.println(i);
                         sonos.Seek_track_nr(i);
 

@@ -776,10 +776,12 @@ public class Sonos {
     public static class posisitionInfo{
 
         public String Duratation,RelTime;
+        public int track;
 
-        public posisitionInfo(String duratation, String relTime) {
-            Duratation = duratation;
-            RelTime = relTime;
+        public posisitionInfo(String duratation, String relTime,int track) {
+            this.Duratation = duratation;
+            this.RelTime = relTime;
+            this.track=track;
         }
     }
     public static posisitionInfo getPosistionInfo() throws IOException {
@@ -821,7 +823,8 @@ public class Sonos {
         System.out.println(oneResponse);
         String duratation = oneResponse.substring(oneResponse.indexOf("<TrackDuration>")+"<TrackDuration>".length(),oneResponse.indexOf("</TrackDuration>"));
         String RelTime = oneResponse.substring(oneResponse.indexOf("<RelTime>")+"<RelTime>".length(),oneResponse.indexOf("</RelTime>"));
-        return new posisitionInfo(duratation,RelTime);
+        int track = Integer.parseInt(oneResponse.substring(oneResponse.indexOf("<Track>")+"<Track>".length(),oneResponse.indexOf("</Track>")));
+        return new posisitionInfo(duratation,RelTime,track);
 
     }
     public void SetTvAsInput() throws IOException {
@@ -1185,7 +1188,7 @@ public class Sonos {
         request.setRequestMethod("POST");
         request.addRequestProperty("SOAPACTION",  "urn:schemas-upnp-org:service:AVTransport:1#AddURIToQueue");
         request.setDoOutput(true);
-        request.setReadTimeout(2000);
+        request.setReadTimeout(5000);
 
 
         OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());

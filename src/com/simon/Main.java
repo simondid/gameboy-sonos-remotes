@@ -6,7 +6,8 @@ import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
-import com.simon.ui.gui2;
+
+import com.simon.ui2.InfoPanel;
 import com.simon.ui2.frame;
 
 import javax.swing.*;
@@ -47,7 +48,7 @@ public class Main{
         sonos = new Sonos(ipAddress);
         activeList = new ArrayList<>();
         gpio=null;
-
+        sonos = new Sonos(ipAddress);
         try {
 
 
@@ -93,7 +94,7 @@ public class Main{
 
             ui();
            setFirstListGui();
-
+            gui.Infopanel.LoadingIconOFF();
 
           // sonos.playSpotifyPlayList(SpotifiUser,SpotifiPlayList,SpotifyPlayListName);
 
