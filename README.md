@@ -38,6 +38,10 @@ link
 sudo nohup java -jar "path to youre jar "/gameboy-sonos-remotes.jar sonosip clientid clientsecretKey userid fullscreenMode
 
 ```
+run in therminal on the script file
+```sh
+sudo chmod +x "youre .sh filename"
+```
 ### runnable .sh file with terminal window
 
 ```sh
@@ -46,7 +50,10 @@ sudo nohup java -jar "path to youre jar "/gameboy-sonos-remotes.jar sonosip clie
 sudo java -jar "path to youre jar "/gameboy-sonos-remotes.jar sonosip clientid clientsecretKey userid fullscreenMode
 
 ```
-
+run in therminal on the script file
+```sh
+sudo chmod +x "youre .sh filename"
+```
 ### auto .sh file on boot
 
 still unkown
