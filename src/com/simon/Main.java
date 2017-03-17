@@ -35,6 +35,7 @@ public class Main{
     static GpioController gpio;
     public static String fullscreen = "";
     public static int debounceTime = 500;
+
     public static void main(String[] args){
 
 
@@ -100,7 +101,23 @@ public class Main{
 
             pi4jSetup();
 
+         /*   new Runnable() {
+                @Override
+                public void run() {
+                    DisplatOFF();
 
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    DisplatON();
+
+                }
+            }.run();
+
+*/
         } catch (IOException e) {
         e.printStackTrace();
     }
@@ -399,10 +416,41 @@ public class Main{
 
         t.start();
     }
+
     public static void setFirstListGui() {
 
         frame.newList(firstList);
     }
+
+    public static void shutdown(){
+        try {
+            String[] args = new String[] {"/bin/bash", "-c", "sudo shutdown"};
+            Process proc = new ProcessBuilder(args).start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void DisplatOFF(){
+        try {
+            String[] args = new String[] {"/bin/bash", "-c", "tvservice -o"};
+            Process proc = new ProcessBuilder(args).start();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void DisplatON(){
+        try {
+            String[] args = new String[] {"/bin/bash", "-c", "tvservice -c \"PAL 4:3\""};
+            Process proc = new ProcessBuilder(args).start();
+            args = new String[] {"/bin/bash", "-c", "sudo service lightdm restart"};
+            new ProcessBuilder(args).start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void getRadioList() {
         try {

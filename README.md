@@ -29,3 +29,24 @@ see piSettingsFiles for config.txt changes
 link
 
 ```
+
+### runnable .sh file no terminal window
+
+```sh
+#!/bin/bash
+
+sudo nohup java -jar "path to youre jar "/gameboy-sonos-remotes.jar sonosip clientid clientsecretKey userid fullscreenMode
+
+```
+### runnable .sh file with terminal window
+
+```sh
+#!/bin/bash
+
+sudo java -jar "path to youre jar "/gameboy-sonos-remotes.jar sonosip clientid clientsecretKey userid fullscreenMode
+
+```
+
+### auto .sh file on boot
+
+still unkown

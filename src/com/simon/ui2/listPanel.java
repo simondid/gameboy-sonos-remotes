@@ -36,6 +36,7 @@ public class listPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JList theList = (JList) e.getSource();
+
                 if (e.getClickCount() == 2) {
                     int index = theList.locationToIndex(e.getPoint());
                     if (index >= 0) {
