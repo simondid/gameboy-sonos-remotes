@@ -1176,8 +1176,51 @@ public class Sonos {
 
         return false;
     }
+    public static void SetAvTransportURI(item  item) throws IOException {
+        System.out.println
+                (new Exception().getStackTrace()[0].getMethodName());
 
-    public int playUri(item item) throws IOException {
+        URL url = new URL("http://" + ipAdress + ":1400/MediaRenderer/AVTransport/Control");
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+
+        request.setRequestMethod("POST");
+        request.addRequestProperty("SOAPACTION",  "\"urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI\"");
+        request.setDoOutput(true);
+        request.setReadTimeout(5000);
+
+
+        OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
+
+        input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "   <s:Body>\n" +
+                "      <u:SetAVTransportURI xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\">\n" +
+                "         <InstanceID>0</InstanceID>\n" +
+                "         <CurrentURI>"+item.uri+"</CurrentURI>\n" +
+                "         <CurrentURIMetaData>"+""+"</CurrentURIMetaData>\n" +
+                "      </u:SetAVTransportURI>\n" +
+                "   </s:Body>\n" +
+                "</s:Envelope>");
+        input.write("");
+
+
+
+        input.flush();
+
+
+        BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+        String oneResponse = new String();
+        String line;
+        while ((line = output.readLine()) != null) {
+            oneResponse += line + "\r\n";
+        }
+        System.out.println(oneResponse);
+
+
+        return;
+
+    }
+    public int AddURIToQueue(item item) throws IOException {
 
         System.out.println
                 (new Exception().getStackTrace()[0].getMethodName());

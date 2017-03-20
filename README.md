@@ -54,6 +54,27 @@ run in therminal on the script file
 ```sh
 sudo chmod +x "youre .sh filename"
 ```
-### auto .sh file on boot
+### auto .sh file on boot (dos the job but bad fix)
+auto start lxterminal and the lxterminal auto starts a .sh script
 
-still unkown
+```sh
+sudo nano .config/lxsession/LXDE-pi/autostart
+```
+
+add to autostart file
+
+```sh
+@lxterminal
+```
+
+then edit
+```sh
+sudo nano .bashrc
+```
+add to the end off the file no < >
+
+```sh
+bash < my .sh file name if located in /home/pi/ >
+```
+
+

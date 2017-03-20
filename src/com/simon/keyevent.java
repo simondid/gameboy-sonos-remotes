@@ -81,11 +81,12 @@ public class keyevent implements KeyListener {
                     // handling radio stations
                     try {
 
-                        int i = sonos.playUri(Main.activeList.get(Main.gui.listPanel.list.getSelectedIndex()));
+                        int i = sonos.AddURIToQueue(Main.activeList.get(Main.gui.listPanel.list.getSelectedIndex()));
                         System.out.println(i);
                         sonos.Seek_track_nr(i);
 
                         sonos.play();
+                        sonos.SetAvTransportURI(Main.activeList.get(Main.gui.listPanel.list.getSelectedIndex()));
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
