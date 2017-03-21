@@ -307,11 +307,11 @@ public class Sonos {
                         album = "null";
                     }
 
-                    System.out.println(i);
-                    System.out.println(active);
+                    //System.out.println(i);
+                   // System.out.println(active);
                     result = result.replace(active, "");
                     item item = new item(name, containerId, parentId, protocolInfo, upnpalbumArtURI, upnpClass, uri, creator, album);
-                    item.print();
+                   // item.print();
                     list.add(item);
                 }
             }

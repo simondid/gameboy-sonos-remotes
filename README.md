@@ -30,7 +30,7 @@ link
 
 ```
 
-### runnable .sh file no terminal window
+### runnable .sh file no terminal window output
 
 ```sh
 #!/bin/bash

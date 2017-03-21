@@ -38,6 +38,8 @@ public class listPanel extends JPanel {
                 JList theList = (JList) e.getSource();
 
                 if (e.getClickCount() == 2) {
+                    new keyevent().selectionHandler();
+                    /*
                     int index = theList.locationToIndex(e.getPoint());
                     if (index >= 0) {
                         Object o = theList.getModel().getElementAt(index);
@@ -49,7 +51,7 @@ public class listPanel extends JPanel {
                             e1.printStackTrace();
                         }
                     }
-
+                    */
 
                 }
             }

@@ -4,6 +4,7 @@ package com.simon;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.io.i2c.I2CFactory;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
 
@@ -13,7 +14,10 @@ import com.simon.ui2.frame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 public class Main{
@@ -39,17 +43,22 @@ public class Main{
     public static void main(String[] args){
 
 
+
         ipAddress = args[0];
         clientId = args[1];
         clientSecret = args[2];
         userid = args[3];
         fullscreen = args[4];
 
+
         spotify = new Spotify(clientId,clientSecret,userid);
         sonos = new Sonos(ipAddress);
         activeList = new ArrayList<>();
         gpio=null;
         sonos = new Sonos(ipAddress);
+
+
+
         try {
 
 
@@ -68,7 +77,6 @@ public class Main{
             //sonos.play();
 
             queuePreBuf = sonos.BrowseQueue(0,0,0);
-            SpotifyPreBuf = spotify.GetPublicPlayLists();
 
 
 
@@ -93,13 +101,14 @@ public class Main{
                 gui.addItem(itemList.get(i).title);
             }*/
 
+
             ui();
-           setFirstListGui();
+
+            setFirstListGui();
             gui.Infopanel.LoadingIconOFF();
 
           // sonos.playSpotifyPlayList(SpotifiUser,SpotifiPlayList,SpotifyPlayListName);
 
-            pi4jSetup();
 
          /*   new Runnable() {
                 @Override
@@ -118,11 +127,29 @@ public class Main{
             }.run();
 
 */
-        } catch (IOException e) {
+
+
+        } catch (Exception e) {
         e.printStackTrace();
     }
 
+        try {
+            new VolumeControle();
+            pi4jSetup();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (I2CFactory.UnsupportedBusNumberException e) {
+            e.printStackTrace();
+        }
 
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                SpotifyPreBuf = spotify.GetPublicPlayLists();
+            }
+        });
+        t.run();
     }
 
     private static void pi4jSetup() {

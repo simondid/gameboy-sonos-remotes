@@ -83,6 +83,9 @@ public class Spotify {
             public void onFailure(Throwable throwable) {
     /* An error occurred while getting the access token. This is probably caused by the client id or
      * client secret is invalid. */
+                System.out.println("Something went wrong! 2" );
+            throwable.printStackTrace();
+            throwable.printStackTrace(System.out);
             }
         });
     return data;
