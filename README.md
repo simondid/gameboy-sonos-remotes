@@ -27,7 +27,7 @@ sudo nano config.txt
 
 see piSettingsFiles for config.txt changes
 link
-
+https://github.com/simondid/gameboy-sonos-remotes/blob/master/readMeImages/config.txt
 ```
 
 ### runnable .sh file no terminal window output
@@ -77,4 +77,10 @@ add to the end off the file no < >
 bash < my .sh file name if located in /home/pi/ >
 ```
 
+### setting raspbian ssh password
+
+```sh
+passwd
+```
+follow instructions
 

@@ -117,7 +117,7 @@ public class InfoPanel extends JPanel {
                 }else{
                     try {
                         isPlaying = new getTransportState().call();
-                        new getPositionInfo().call();
+//                        new getPositionInfo().call();
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -126,6 +126,18 @@ public class InfoPanel extends JPanel {
             }
         });
         t.start();
+
+        Timer t2 = new Timer(10000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    new getPositionInfo().call();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        t2.start();
      //   updatInfoPanel(null);
     }
 

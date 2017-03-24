@@ -13,12 +13,16 @@ import com.simon.ui2.frame;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class Main{
     public static String ipAddress = "";
@@ -58,13 +62,22 @@ public class Main{
         sonos = new Sonos(ipAddress);
 
 
+        Timer timer = new Timer(300000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Calendar cal = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+                System.out.println( "time : "+sdf.format(cal.getTime()) );
+            }
+        });
+        timer.start();
 
         try {
 
 
 
 
-         sonos.getTransportInfo();
+//         sonos.getTransportInfo();
       //      sonos.setGroupVolume(55);
 
       //      sonos.Next();
@@ -132,33 +145,33 @@ public class Main{
         } catch (Exception e) {
         e.printStackTrace();
     }
+//        try {
+//            new VolumeControle();
+//            pi4jSetup();
+        SpotifyPreBuf = spotify.GetPublicPlayLists();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (I2CFactory.UnsupportedBusNumberException e) {
+//            e.printStackTrace();
+//        }
 
-        try {
-            new VolumeControle();
-            pi4jSetup();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (I2CFactory.UnsupportedBusNumberException e) {
-            e.printStackTrace();
-        }
 
-
-        Thread t = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SpotifyPreBuf = spotify.GetPublicPlayLists();
-            }
-        });
-        t.run();
+//        Thread t = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//            }
+//        });
+//        t.run();
     }
 
     private static void pi4jSetup() {
 
-        try {
-            Robot  r = new Robot();
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Robot  r = new Robot();
+//        } catch (AWTException e) {
+//            e.printStackTrace();
+//        }
         gpio = GpioFactory.getInstance();
 
         pi4jButtonLeftSetup(); // gpio 02

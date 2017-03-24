@@ -137,7 +137,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
 
         Main.getQueue();
     }
@@ -188,7 +188,7 @@ public class Sonos {
             oneResponse +=line;
         }
 
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
 
         browse data = new browse();
         data.result = html2text(oneResponse.substring(oneResponse.indexOf("<Result>")+"<Result>".length(),oneResponse.indexOf("</Result>")));
@@ -217,6 +217,7 @@ public class Sonos {
 
             browse input = Browse(objectid, BrowseFlag, Filter, StartingIndex, RequestCount, SortCiteria);
             int matchesCount = input.TotalMatches;
+
             System.out.println
                     (new Exception().getStackTrace()[0].getMethodName());
             System.out.println(input.result);
@@ -338,8 +339,8 @@ public class Sonos {
         browse input = Browse(objectid,BrowseFlag,Filter,StartingIndex,RequestCount,SortCiteria);
         System.out.print("");
         String result = input.result;
-        System.out.println(result);
-        System.out.println();
+//        System.out.println(result);
+//        System.out.println();
         browse data = new browse();
         data.numberReturned = input.numberReturned;
         data.updateID = input.updateID;
@@ -379,8 +380,9 @@ public class Sonos {
             } else {
                 parentId = "null";
             }
-            System.out.println(i);
-            System.out.println(active);
+//            System.out.println(i);
+//            System.out.println(active);
+
             result = result.replace(active,"");
 
             data.container.add(new browseContainer(name,containerId,parentId));
@@ -592,7 +594,7 @@ public class Sonos {
             // oneResponse += line + "\r\n";
             oneResponse +=line;
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
 
         browseItem data = new browseItem();
         data.result = oneResponse.substring(oneResponse.indexOf("<Result>")+"<Result>".length(),oneResponse.indexOf("</Result>"));
@@ -732,7 +734,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public static void play() throws IOException {
         System.out.println
@@ -771,7 +773,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public static class posisitionInfo{
 
@@ -820,7 +822,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
         String duratation = oneResponse.substring(oneResponse.indexOf("<TrackDuration>")+"<TrackDuration>".length(),oneResponse.indexOf("</TrackDuration>"));
         String RelTime = oneResponse.substring(oneResponse.indexOf("<RelTime>")+"<RelTime>".length(),oneResponse.indexOf("</RelTime>"));
         int track = Integer.parseInt(oneResponse.substring(oneResponse.indexOf("<Track>")+"<Track>".length(),oneResponse.indexOf("</Track>")));
@@ -865,7 +867,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public void SetPlayListAsInput() throws IOException {
 
@@ -905,7 +907,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public static void Stop() throws IOException {
         System.out.println
@@ -943,7 +945,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public static void Next() throws IOException {
         System.out.println
@@ -981,7 +983,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public static void Seek_track_nr(int position) throws IOException {
 
@@ -1023,7 +1025,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
 
     }
 
@@ -1064,7 +1066,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
     }
     public static boolean setGroupVolume(int volume) throws IOException {
         System.out.println
@@ -1107,7 +1109,7 @@ public class Sonos {
                 oneResponse += line + "\r\n";
             }
 
-            System.out.println(oneResponse);
+//            System.out.println(oneResponse);
 
 
         }else{
@@ -1214,7 +1216,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
 
 
         return;
@@ -1261,7 +1263,7 @@ public class Sonos {
         while ((line = output.readLine()) != null) {
             oneResponse += line + "\r\n";
         }
-        System.out.println(oneResponse);
+//        System.out.println(oneResponse);
 
 
         int i1 = oneResponse.indexOf("<FirstTrackNumberEnqueued>")+"<FirstTrackNumberEnqueued>".length();
