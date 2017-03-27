@@ -84,3 +84,11 @@ passwd
 ```
 follow instructions
 
+
+
+## electronics wiring
+
+### screen on / off controler
+http://i63.tinypic.com/11jc6mq.png
+
+![screen on / off controler](http://i63.tinypic.com/11jc6mq.png "screen on / off controler")

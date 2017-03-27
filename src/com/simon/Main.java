@@ -62,12 +62,14 @@ public class Main{
         sonos = new Sonos(ipAddress);
 
 
-        Timer timer = new Timer(300000, new ActionListener() {
+        Timer timer = new Timer(5000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 System.out.println( "time : "+sdf.format(cal.getTime()) );
+
+                GpioPinDigital pin = gpio.getProvisionedPin()
             }
         });
         timer.start();
