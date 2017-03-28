@@ -4,6 +4,9 @@ package com.simon;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.io.gpio.trigger.GpioCallbackTrigger;
+import com.pi4j.io.gpio.trigger.GpioSetStateTrigger;
+import com.pi4j.io.gpio.trigger.GpioTrigger;
 import com.pi4j.io.i2c.I2CFactory;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
@@ -23,6 +26,7 @@ import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.Callable;
 
 public class Main{
     public static String ipAddress = "";
@@ -40,11 +44,13 @@ public class Main{
     public static ArrayList<item> radioStationList;
     static Spotify spotify;
     public static GpioPinDigitalInput ButtonLeft,ButtonRight,ButtonUp,ButtonDown,ButtonA,ButtonB,ButtonSelect,ButtonStart;
+    public static GpioPinDigitalOutput ScreenPin;
     static GpioController gpio;
     public static String fullscreen = "";
     public static int debounceTime = 500;
+    public static Timer screenTimer;
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws InterruptedException {
 
 
 
@@ -69,7 +75,8 @@ public class Main{
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 System.out.println( "time : "+sdf.format(cal.getTime()) );
 
-                GpioPinDigital pin = gpio.getProvisionedPin()
+
+
             }
         });
         timer.start();
@@ -149,8 +156,23 @@ public class Main{
     }
 //        try {
 //            new VolumeControle();
-//            pi4jSetup();
         SpotifyPreBuf = spotify.GetPublicPlayLists();
+        screenTimer = new Timer(30000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                ScreenPin.high();
+            }
+        });
+        screenTimer.start();
+        Thread.sleep(15000);
+            pi4jSetup();
+
+
+
+
+
+
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        } catch (I2CFactory.UnsupportedBusNumberException e) {
@@ -165,6 +187,9 @@ public class Main{
 //            }
 //        });
 //        t.run();
+
+
+
     }
 
     private static void pi4jSetup() {
@@ -176,15 +201,28 @@ public class Main{
 //        }
         gpio = GpioFactory.getInstance();
 
-        pi4jButtonLeftSetup(); // gpio 02
-        pi4jButtonRightSetup(); // gpio 00
-        pi4jButtonUpSetup(); // gpio 01
-        pi4jButtonDownSetup(); // gpio 04
-        pi4jButtonASetup(); //gpio 05
-        pi4jButtonStartSetup(); // gpio 06
-        pi4jButtonSelectSetup(); // gpio 07
+//        pi4jButtonLeftSetup(); // gpio 02
+//        pi4jButtonRightSetup(); // gpio 00
+//        pi4jButtonUpSetup(); // gpio 08
+//        pi4jButtonDownSetup(); // gpio 04
+//        pi4jButtonASetup(); //gpio 05
+//        pi4jButtonBSetup();
+//        pi4jButtonStartSetup(); // gpio 06
+//        pi4jButtonSelectSetup(); // gpio 07
+        pi4jScreenControler();
+
 
     }
+
+    public static void screenToogle(){
+      ScreenPin.toggle();
+        System.out.println("scrren is : " + ScreenPin.getState());
+    }
+    private static void pi4jScreenControler() {
+       ScreenPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01);
+       ScreenPin.setShutdownOptions(false);
+    }
+
     public static void pi4jButtonSelectSetup(){
         ButtonSelect = gpio.provisionDigitalInputPin(RaspiPin.GPIO_07, PinPullResistance.PULL_DOWN);
         ButtonSelect.setShutdownOptions(true);
@@ -205,7 +243,7 @@ public class Main{
                 } catch (AWTException e) {
                     e.printStackTrace();
                 }
-
+//
             }
 
         });
@@ -280,7 +318,7 @@ public class Main{
                 } catch (AWTException e) {
                     e.printStackTrace();
                 }
-
+//
             }
 
         });
@@ -311,7 +349,8 @@ public class Main{
         });
     }
     public static void pi4jButtonUpSetup(){
-        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, PinPullResistance.PULL_DOWN);
+//        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_08, PinPullResistance.PULL_DOWN);
+        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_08);
         ButtonUp.setShutdownOptions(true);
         ButtonUp.setDebounce(debounceTime);
         ButtonUp.addListener(new GpioPinListenerDigital() {
@@ -364,11 +403,13 @@ public class Main{
         ButtonLeft = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_DOWN);
         ButtonLeft.setShutdownOptions(true);
         ButtonLeft.setDebounce(debounceTime);
+
+
         ButtonLeft.addListener(new GpioPinListenerDigital() {
 
             @Override
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-                // display pin state on console
+//                 display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
                 try {
                     Robot  r = new Robot();

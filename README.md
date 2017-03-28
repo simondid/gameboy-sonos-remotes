@@ -90,5 +90,8 @@ follow instructions
 
 ### screen on / off controler
 http://i63.tinypic.com/11jc6mq.png
+http://electronics.stackexchange.com/questions/233205/npn-transistor-to-run-12v-0-5a-from-3-3v-4ma
+
+gpio 1 aka pin 12 on the raspberry pi model b
 
 ![screen on / off controler](http://i63.tinypic.com/11jc6mq.png "screen on / off controler")

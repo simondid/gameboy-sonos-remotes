@@ -30,6 +30,7 @@ public class keyevent implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        screenhandler();
         Main.gui.listPanel.list.ensureIndexIsVisible(Main.gui.listPanel.list.getSelectedIndex());
 
         sonos = Main.sonos;
@@ -54,9 +55,18 @@ public class keyevent implements KeyListener {
         }
 
     }
+    private static void screenhandler(){
+        System.out.println("screen timer reset");
+//        if(Main.ScreenPin.isLow()) {
+          Main.ScreenPin.low();
+            Main.screenTimer.restart();
 
+//        }else{
+//            Main.ScreenPin.low();
+//        }
+    }
     public static void selectionHandler(){
-
+        screenhandler();
         System.out.println("index : "+Main.gui.listPanel.list.getSelectedIndex() + " flag : "+ Main.firstListFlag);
         switch (Main.firstListFlag){
             case -1:

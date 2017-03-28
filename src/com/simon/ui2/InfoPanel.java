@@ -1,6 +1,7 @@
 package com.simon.ui2;
 
 import com.oracle.deploy.update.UpdateInfo;
+import com.pi4j.io.gpio.*;
 import com.simon.Main;
 import com.simon.sonos.Sonos;
 import com.simon.sonos.item;
@@ -25,6 +26,7 @@ public class InfoPanel extends JPanel {
     JLabel title;
     JLabel wIcon;
     Timer t;
+    GpioController gpio;
     public InfoPanel() {
 
         Dimension size = getPreferredSize();
@@ -92,16 +94,24 @@ public class InfoPanel extends JPanel {
         add(wIcon,gc);
 
 
-
+        gpio = GpioFactory.getInstance();
 
         t = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //try {
+                boolean state = false;
+                System.out.println(" 1 second timer");
+//                GpioPinDigitalOutput p = gpio.getProvisionedPin(RaspiPin.GPIO_01);
 
+                    state = getState();
+//                if(Main.ScreenPin.isHigh()){
+//                    System.out.println("scrren pin is high1");
+//                }
+                if (state) {
 
                     //  if (Main.sonos.getTransportInfo()) {
-                    if(isPlaying){
+                    if (isPlaying) {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
@@ -111,36 +121,58 @@ public class InfoPanel extends JPanel {
                             }
                         });
 
-                }
-                if (pb.getMaximum() == pb.getValue()) {
-                   // updatInfoPanel(null);
-                }else{
-                    try {
-                        isPlaying = new getTransportState().call();
-//                        new getPositionInfo().call();
-                    } catch (Exception e1) {
-                        e1.printStackTrace();
                     }
-                }
+                    if (pb.getMaximum() == pb.getValue()) {
+                        // updatInfoPanel(null);
+                    } else {
+                        try {
+                            isPlaying = new getTransportState().call();
+//                        new getPositionInfo().call();
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
+                    }
 
+//                }
+                }
             }
         });
         t.start();
 
+
         Timer t2 = new Timer(10000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    new getPositionInfo().call();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                boolean state = getState();
+//                if(Main.ScreenPin.isHigh()){
+//                    System.out.println("scrren pin is high2");
+//                }
+//                if (Main.ScreenPin.isLow()) {
+                if(state) {
+                    try {
+                        new getPositionInfo().call();
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
                 }
+//                }
             }
         });
         t2.start();
      //   updatInfoPanel(null);
     }
-
+    private boolean getState(){
+        boolean state = false;
+        if (Main.ScreenPin != null) {
+            System.out.println(Main.ScreenPin.getState());
+            if (Main.ScreenPin.getState().isHigh()) {
+                state = false;
+            } else {
+                state = true;
+            }
+        }
+        return state;
+    }
     public int timeformatToInt(String time){
         String[] units = time.split(":"); //will break the string up into an array
         int houres = Integer.parseInt(units[0]); //first element
