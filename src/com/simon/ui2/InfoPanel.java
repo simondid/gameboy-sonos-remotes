@@ -101,7 +101,7 @@ public class InfoPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 //try {
                 boolean state = false;
-                System.out.println(" 1 second timer");
+//                System.out.println(" 1 second timer");
 //                GpioPinDigitalOutput p = gpio.getProvisionedPin(RaspiPin.GPIO_01);
 
                     state = getState();
@@ -165,7 +165,7 @@ public class InfoPanel extends JPanel {
 //        boolean state = false;
         if(Main.Pi4jActive) {
             if (Main.ScreenPin != null) {
-                System.out.println(Main.ScreenPin.getState());
+//                System.out.println(Main.ScreenPin.getState());
                 if (Main.ScreenPin.getState().isHigh()) {
 //                state = false;
                     return false;

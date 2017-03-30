@@ -175,6 +175,7 @@ public class Main{
         Thread.sleep(15000);
         if(Pi4jActive) {
             pi4jSetup();
+            LowPowerCalls.turnOffOnbordLeds();
         }
 
 
@@ -199,6 +200,7 @@ public class Main{
 
 
     }
+
 
     private static void pi4jSetup() {
 
