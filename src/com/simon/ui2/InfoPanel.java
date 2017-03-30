@@ -93,9 +93,9 @@ public class InfoPanel extends JPanel {
 
         add(wIcon,gc);
 
-
-        gpio = GpioFactory.getInstance();
-
+        if(Main.Pi4jActive) {
+            gpio = GpioFactory.getInstance();
+        }
         t = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -162,16 +162,22 @@ public class InfoPanel extends JPanel {
      //   updatInfoPanel(null);
     }
     private boolean getState(){
-        boolean state = false;
-        if (Main.ScreenPin != null) {
-            System.out.println(Main.ScreenPin.getState());
-            if (Main.ScreenPin.getState().isHigh()) {
-                state = false;
-            } else {
-                state = true;
+//        boolean state = false;
+        if(Main.Pi4jActive) {
+            if (Main.ScreenPin != null) {
+                System.out.println(Main.ScreenPin.getState());
+                if (Main.ScreenPin.getState().isHigh()) {
+//                state = false;
+                    return false;
+                } else {
+                    return true;
+//                state = true;
+                }
             }
+        }else{
+            return true;
         }
-        return state;
+        return false;
     }
     public int timeformatToInt(String time){
         String[] units = time.split(":"); //will break the string up into an array

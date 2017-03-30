@@ -8,6 +8,7 @@ import com.pi4j.io.gpio.trigger.GpioCallbackTrigger;
 import com.pi4j.io.gpio.trigger.GpioSetStateTrigger;
 import com.pi4j.io.gpio.trigger.GpioTrigger;
 import com.pi4j.io.i2c.I2CFactory;
+import com.pi4j.system.SystemInfo;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
 
@@ -23,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -49,11 +51,21 @@ public class Main{
     public static String fullscreen = "";
     public static int debounceTime = 500;
     public static Timer screenTimer;
-
+    public static boolean Pi4jActive = false;
     public static void main(String[] args) throws InterruptedException {
 
+        if(!SystemInfo.getOsName().contains("Windows")){
+            Pi4jActive = true;
+        }
 
-
+//        try {
+//            new systeminfoPrint();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//
         ipAddress = args[0];
         clientId = args[1];
         clientSecret = args[2];
@@ -75,16 +87,11 @@ public class Main{
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 System.out.println( "time : "+sdf.format(cal.getTime()) );
 
-
-
             }
         });
         timer.start();
 
         try {
-
-
-
 
 //         sonos.getTransportInfo();
       //      sonos.setGroupVolume(55);
@@ -157,7 +164,7 @@ public class Main{
 //        try {
 //            new VolumeControle();
         SpotifyPreBuf = spotify.GetPublicPlayLists();
-        screenTimer = new Timer(30000, new ActionListener() {
+        screenTimer = new Timer(60000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
@@ -166,8 +173,9 @@ public class Main{
         });
         screenTimer.start();
         Thread.sleep(15000);
+        if(Pi4jActive) {
             pi4jSetup();
-
+        }
 
 
 
@@ -405,23 +413,18 @@ public class Main{
         ButtonLeft.setDebounce(debounceTime);
 
 
-        ButtonLeft.addListener(new GpioPinListenerDigital() {
-
-            @Override
-            public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+        ButtonLeft.addListener((GpioPinListenerDigital) event -> {
 //                 display pin state on console
-                System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_LEFT);
-                    }else {
-                        r.keyRelease(KeyEvent.VK_LEFT);
-                    }
-                } catch (AWTException e) {
-                    e.printStackTrace();
+            System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
+            try {
+                Robot  r = new Robot();
+                if(event.getState().isHigh()) {
+                    r.keyPress(KeyEvent.VK_LEFT);
+                }else {
+                    r.keyRelease(KeyEvent.VK_LEFT);
                 }
-
+            } catch (AWTException e) {
+                e.printStackTrace();
             }
 
         });

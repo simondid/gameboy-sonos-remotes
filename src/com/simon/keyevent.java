@@ -53,14 +53,14 @@ public class keyevent implements KeyListener {
                 selectionHandler();
 
         }
-
     }
     private static void screenhandler(){
         System.out.println("screen timer reset");
 //        if(Main.ScreenPin.isLow()) {
-          Main.ScreenPin.low();
+        if(Main.Pi4jActive) {
+            Main.ScreenPin.low();
             Main.screenTimer.restart();
-
+        }
 //        }else{
 //            Main.ScreenPin.low();
 //        }
