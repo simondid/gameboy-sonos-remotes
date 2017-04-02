@@ -47,16 +47,14 @@ public class Main{
     static Spotify spotify;
     public static GpioPinDigitalInput ButtonLeft,ButtonRight,ButtonUp,ButtonDown,ButtonA,ButtonB,ButtonSelect,ButtonStart;
     public static GpioPinDigitalOutput ScreenPin;
-    static GpioController gpio;
+    public static GpioController gpio;
     public static String fullscreen = "";
     public static int debounceTime = 500;
     public static Timer screenTimer;
     public static boolean Pi4jActive = false;
     public static void main(String[] args) throws InterruptedException {
 
-        if(!SystemInfo.getOsName().contains("Windows")){
-            Pi4jActive = true;
-        }
+        System.getProperties().list(System.out);
 
 //        try {
 //            new systeminfoPrint();
@@ -173,6 +171,16 @@ public class Main{
         });
         screenTimer.start();
         Thread.sleep(15000);
+//        try {
+//            new systeminfoPrint();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+        if(!System.getProperty("os.name").contains("Windows")){
+            Pi4jActive = true;
+        }
         if(Pi4jActive) {
             pi4jSetup();
             LowPowerCalls.turnOffOnbordLeds();
@@ -209,7 +217,9 @@ public class Main{
 //        } catch (AWTException e) {
 //            e.printStackTrace();
 //        }
-        gpio = GpioFactory.getInstance();
+        final GpioController instance = GpioFactory.getInstance();
+
+        gpio = instance;
 
 //        pi4jButtonLeftSetup(); // gpio 02
 //        pi4jButtonRightSetup(); // gpio 00

@@ -84,6 +84,16 @@ passwd
 ```
 follow instructions
 
+### ACT and PWR LED controle
+commands work but seems unstable multiple class seems to be the bedst fix atm
+
+```
+echo 0 | sudo tee /sys/class/leds/led1/brightness
+
+echo 1 | sudo tee /sys/class/leds/led0/brightness
+```
+
+
 
 
 ## electronics wiring
@@ -95,3 +105,15 @@ http://electronics.stackexchange.com/questions/233205/npn-transistor-to-run-12v-
 gpio 1 aka pin 12 on the raspberry pi model b
 
 ![screen on / off controler](http://i63.tinypic.com/11jc6mq.png "screen on / off controler")
+
+
+### battery management circuit based on the max17043 lipo fuel gauge
+http://i65.tinypic.com/xdf0wi.png
+https://github.com/simondid/MAX17043
+
+the battery management code is gonna be based on my max17043 class
+
+https://github.com/simondid/MAX17043
+
+
+![battery circuit](http://i65.tinypic.com/xdf0wi.png "battery circuit")

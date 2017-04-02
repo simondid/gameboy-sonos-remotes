@@ -9,6 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="jsoup-1.10.2-javadoc" level="application" />
     <orderEntry type="library" name="se.michaelthelin.spotify:spotify-web-api-java:1.5.0" level="application" />
-    <orderEntry type="library" name="junit" level="project" />
+    <orderEntry type="library" name="pi4j 1.2 snapshot" level="project" />
   </component>
 </module>

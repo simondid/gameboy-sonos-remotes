@@ -20,7 +20,11 @@ public class LowPowerCalls {
     private static void PowerSavePwrLedOff(){
 //        echo 0 | sudo tee /sys/class/leds/led1/brightness
 
+        PowerSavePwrLedOn();
+        PowerSavePwrLedOn();
+        System.out.println("powering off PWR led");
         try {
+            Runtime.getRuntime().exec("echo 0 | sudo tee /sys/class/leds/led1/brightness");
             Runtime.getRuntime().exec("echo 0 | sudo tee /sys/class/leds/led1/brightness");
         } catch (IOException e) {
             e.printStackTrace();
@@ -28,6 +32,7 @@ public class LowPowerCalls {
     }
     private static void PowerSavePwrLedOn(){
 //        echo 1 | sudo tee /sys/class/leds/led1/brightness
+        System.out.println("powering on PWR LED");
 
         try {
             Runtime.getRuntime().exec("echo 1 | sudo tee /sys/class/leds/led1/brightness");
@@ -39,7 +44,11 @@ public class LowPowerCalls {
 //        class the follow command to turn off the act led to save power
        // echo 1 | sudo tee /sys/class/leds/led0/brightness
 
+        PowerSaveActLedOn();
+        PowerSaveActLedOn();
+        System.out.println("Powering off ACT led");
         try {
+            Runtime.getRuntime().exec("echo 1 | sudo tee /sys/class/leds/led0/brightness");
             Runtime.getRuntime().exec("echo 1 | sudo tee /sys/class/leds/led0/brightness");
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,7 +57,7 @@ public class LowPowerCalls {
     public static void PowerSaveActLedOn(){
 //        class the follow command to turn off the act led to save power
         // echo 0 | sudo tee /sys/class/leds/led0/brightness
-
+        System.out.println("Powering on ACT led ");
         try {
             Runtime.getRuntime().exec("echo 0 | sudo tee /sys/class/leds/led0/brightness");
         } catch (IOException e) {
