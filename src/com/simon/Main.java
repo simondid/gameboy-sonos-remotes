@@ -7,14 +7,17 @@ import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 import com.pi4j.io.gpio.trigger.GpioCallbackTrigger;
 import com.pi4j.io.gpio.trigger.GpioSetStateTrigger;
 import com.pi4j.io.gpio.trigger.GpioTrigger;
+import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.system.SystemInfo;
+import com.simon.max1704x_lipo_gauge.max17043;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
 
 import com.simon.ui2.InfoPanel;
 import com.simon.ui2.frame;
 
+import javax.sound.midi.Soundbank;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -88,6 +91,8 @@ public class Main{
             }
         });
         timer.start();
+
+
 
         try {
 
@@ -184,6 +189,8 @@ public class Main{
         if(Pi4jActive) {
             pi4jSetup();
             LowPowerCalls.turnOffOnbordLeds();
+
+
         }
 
 
@@ -220,6 +227,17 @@ public class Main{
         final GpioController instance = GpioFactory.getInstance();
 
         gpio = instance;
+
+        try {
+            max17043 max = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
+            max.setAlertThreshold(3);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (I2CFactory.UnsupportedBusNumberException e) {
+            e.printStackTrace();
+        }
+
 
 //        pi4jButtonLeftSetup(); // gpio 02
 //        pi4jButtonRightSetup(); // gpio 00
@@ -522,6 +540,9 @@ public class Main{
 
     public static void shutdown(){
         try {
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("auto shutdown do to low battery to protect the battery");
+            System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             String[] args = new String[] {"/bin/bash", "-c", "sudo shutdown"};
             Process proc = new ProcessBuilder(args).start();
 

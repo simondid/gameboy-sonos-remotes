@@ -2,7 +2,10 @@ package com.simon.ui2;
 
 import com.oracle.deploy.update.UpdateInfo;
 import com.pi4j.io.gpio.*;
+import com.pi4j.io.i2c.I2CBus;
+import com.pi4j.io.i2c.I2CFactory;
 import com.simon.Main;
+import com.simon.max1704x_lipo_gauge.max17043;
 import com.simon.sonos.Sonos;
 import com.simon.sonos.item;
 
@@ -12,7 +15,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
+import java.util.Calendar;
 import java.util.concurrent.*;
 
 /**
@@ -25,10 +32,22 @@ public class InfoPanel extends JPanel {
     final JProgressBar pb;
     JLabel title;
     JLabel wIcon;
+    JLabel Battery;
     Timer t;
-    GpioController gpio;
+//    GpioController gpio;
+    private volatile static max17043 max;
+    public static NumberFormat format = new DecimalFormat("#0.00");
+    volatile double soc;
     public InfoPanel() {
-
+        if(Main.Pi4jActive) {
+            try {
+                max = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (I2CFactory.UnsupportedBusNumberException e1) {
+                e1.printStackTrace();
+            }
+        }
         Dimension size = getPreferredSize();
         size.height = 50;
         setPreferredSize(size);
@@ -39,6 +58,7 @@ public class InfoPanel extends JPanel {
         JLabel LabelArtist = new JLabel("Artist");
 
         title = new JLabel("test title");
+        Battery = new JLabel("50%");
         JLabel Artist = new JLabel("test arTist");
 
 
@@ -75,7 +95,13 @@ public class InfoPanel extends JPanel {
       //  add(LabelArtist,gc);
 
 //        gc.anchor = GridBagConstraints.FIRST_LINE_START;
-        gc.anchor = GridBagConstraints.CENTER;
+        gc.weightx = 1;
+        gc.gridx = 0;
+        gc.gridy =1;
+        add(Battery,gc);
+
+//        gc.anchor = GridBagConstraints.CENTER;
+        gc.weightx = 0.5;
         gc.gridx = 1;
         gc.gridy =1;
         add(title,gc);
@@ -94,7 +120,7 @@ public class InfoPanel extends JPanel {
         add(wIcon,gc);
 
         if(Main.Pi4jActive) {
-            gpio = GpioFactory.getInstance();
+//            gpio = GpioFactory.getInstance();
         }
         t = new Timer(1000, new ActionListener() {
             @Override
@@ -159,6 +185,56 @@ public class InfoPanel extends JPanel {
             }
         });
         t2.start();
+
+        Timer bms = new Timer(5000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (Main.Pi4jActive) {
+                                try {
+                                    max17043 cp = null;
+                                    try {
+                                        cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    } catch (I2CFactory.UnsupportedBusNumberException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+                                    double d = soc = cp.getSOC();
+                                    if(d<4){
+                                        Main.shutdown();
+                                    }
+//                                    System.out.println("SOC : " + d);
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Calendar cal = Calendar.getInstance();
+                                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+//                                            System.out.println( "time : "+sdf.format(cal.getTime()) );
+
+                                            Battery.setText(format.format(d) + "%");
+                                            System.out.println("updaing battery state SOC = " + format.format(soc) + " ; " + sdf.format(cal.getTime()));
+
+
+                                        }
+                                    });
+
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                } catch (InterruptedException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }else {
+                                Battery.setText("N/A");
+                            }
+                        }
+
+                    });
+        }});
+        bms.start();
      //   updatInfoPanel(null);
     }
     private boolean getState(){

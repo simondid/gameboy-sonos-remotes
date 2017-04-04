@@ -76,10 +76,12 @@ public class max17043 {
         return version;
     }
     public static double getSOC() throws IOException, InterruptedException {
-        wake(device);
-        Thread.sleep(150);
+        if(isSleeping(device)) {
+            wake(device);
+        }
+      //  Thread.sleep(1000);
         double SOC = getSoC(device);
-        sleep(device);
+//        sleep(device);
         return SOC;
     }
     public double getVcell() throws IOException, InterruptedException {
@@ -338,7 +340,7 @@ public class max17043 {
         double b = buffer[0]+(buffer[1] / 256.0);
 //        System.out.println("modified output : " + b);
 //        System.out.println("bytes to hex : " + bytesToHex(buffer));
-
+        System.out.println("getting new SOC");
         return b;
     }
 
