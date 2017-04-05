@@ -211,7 +211,15 @@ public class Main{
 //            }
 //        });
 //        t.run();
-
+        Shutdown shutdown = new Shutdown();
+        try {
+            Runtime.getRuntime().addShutdownHook(new ShutdownThread(shutdown));
+            System.out.println("[Main thread] Shutdown hook added");
+        } catch (Throwable t) {
+            // we get here when the program is run with java
+            // version 1.2.2 or older
+            System.out.println("[Main thread] Could not add Shutdown hook");
+        }
 
 
     }
@@ -248,6 +256,7 @@ public class Main{
 //        pi4jButtonStartSetup(); // gpio 06
 //        pi4jButtonSelectSetup(); // gpio 07
         pi4jScreenControler();
+
 
 
     }
