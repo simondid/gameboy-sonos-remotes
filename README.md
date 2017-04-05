@@ -96,6 +96,13 @@ echo 1 | sudo tee /sys/class/leds/led0/brightness
 
 
 
+# hardware
+pi zero w
+adafruit powerboost 1000c
+lipo fuel gauge max 17043
+2000mha lipo battery ( power test screen off for the intire test gives 7 houres and 1 minutes off battery life )
+
+
 ## electronics wiring
 
 ### screen on / off controler

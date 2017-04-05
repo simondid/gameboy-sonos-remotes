@@ -43,6 +43,7 @@ public class max17043 {
         if(!isSleeping(device)){
             sleep(device);
         }
+        
         clearAlertInterrupt(device);
     }
     public static boolean isSleeping(I2CDevice device) throws IOException {
