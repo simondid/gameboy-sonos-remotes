@@ -11,6 +11,8 @@ import com.wrapper.spotify.methods.UserPlaylistsRequest;
 import com.wrapper.spotify.methods.authentication.ClientCredentialsGrantRequest;
 import com.wrapper.spotify.models.*;
 
+import java.io.IOError;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -29,6 +31,7 @@ public class Spotify {
     public static Api api;
 
     public static ArrayList<item> GetPublicPlayLists() {
+
         System.out.println("dav123");
         System.out.println
                 (new Exception().getStackTrace()[0].getMethodName());
@@ -44,7 +47,14 @@ public class Spotify {
         final ClientCredentialsGrantRequest request = api.clientCredentialsGrant().build();
 
 /* Use the request object to make the request, either asynchronously (getAsync) or synchronously (get) */
-        final SettableFuture<ClientCredentials> responseFuture = request.getAsync();
+
+
+        final SettableFuture<ClientCredentials> responseFuture;
+
+
+     responseFuture = request.getAsync();
+
+
 
 /* Add callbacks to handle success and failure */
         Futures.addCallback(responseFuture, new FutureCallback<ClientCredentials>() {

@@ -18,7 +18,7 @@ public class frame extends JFrame {
     public InfoPanel Infopanel;
     public static listPanel listPanel;
     GraphicsEnvironment e;
-    public frame(String fullscreen) throws HeadlessException {
+    public frame(boolean fullscreen) throws HeadlessException {
       //  super("title");
 
 
@@ -48,7 +48,7 @@ public class frame extends JFrame {
         c.add(Infopanel,BorderLayout.NORTH);
         c.add(listPanel);
         System.out.println("trigger "+fullscreen);
-        if(fullscreen.contains("true")||fullscreen.contains("1")){
+        if(fullscreen){
             setFullScreen(this);
         }
 

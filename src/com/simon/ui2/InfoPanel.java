@@ -46,6 +46,8 @@ public class InfoPanel extends JPanel {
                 e1.printStackTrace();
             } catch (I2CFactory.UnsupportedBusNumberException e1) {
                 e1.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
         Dimension size = getPreferredSize();
@@ -155,7 +157,8 @@ public class InfoPanel extends JPanel {
                             isPlaying = new getTransportState().call();
 //                        new getPositionInfo().call();
                         } catch (Exception e1) {
-                            e1.printStackTrace();
+//                            e1.printStackTrace();
+                            isPlaying=false;
                         }
                     }
 
@@ -163,6 +166,7 @@ public class InfoPanel extends JPanel {
                 }
             }
         });
+        Main.timers.add(t);
         t.start();
 
 
@@ -178,15 +182,17 @@ public class InfoPanel extends JPanel {
                     try {
                         new getPositionInfo().call();
                     } catch (Exception e1) {
-                        e1.printStackTrace();
+//                        e1.printStackTrace();
+
                     }
                 }
 //                }
             }
         });
+        Main.timers.add(t2);
         t2.start();
 
-        Timer bms = new Timer(5000, new ActionListener() {
+        Timer bms = new Timer(30000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -204,7 +210,7 @@ public class InfoPanel extends JPanel {
                                     }
 
                                     double d = soc = cp.getSOC();
-                                    if(d<4){
+                                    if(cp.getAlertTriggered()){
                                         Main.shutdown();
                                     }
 //                                    System.out.println("SOC : " + d);
@@ -234,6 +240,7 @@ public class InfoPanel extends JPanel {
 
                     });
         }});
+        Main.timers.add(bms);
         bms.start();
      //   updatInfoPanel(null);
     }
@@ -321,17 +328,18 @@ public class InfoPanel extends JPanel {
             Sonos s = new Sonos(Main.ipAddress);
 
             Sonos.posisitionInfo data = s.getPosistionInfo();
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    pb.setMaximum(timeformatToInt(data.Duratation));
-                    pb.setValue(timeformatToInt(data.RelTime));
+            if(data!=null) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        pb.setMaximum(timeformatToInt(data.Duratation));
+                        pb.setValue(timeformatToInt(data.RelTime));
 //                    pb.setString(Main.activeList.get(data.track).title);
-                    title.setText(Main.queuePreBuf.get(data.track-1).title);
-                    updatInfoPanel(Main.queuePreBuf.get(data.track-1));
-                }
-            });
-
+                        title.setText(Main.queuePreBuf.get(data.track - 1).title);
+                        updatInfoPanel(Main.queuePreBuf.get(data.track - 1));
+                    }
+                });
+            }
             return null;
         }
     }

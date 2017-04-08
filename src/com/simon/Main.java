@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.concurrent.Callable;
 
-public class Main{
+public class Main {
     public static String ipAddress = "";
     static String clientId = "";
     static String clientSecret = "";
@@ -42,186 +42,197 @@ public class Main{
     public static ArrayList<item> activeList;
     public static ArrayList<item> queuePreBuf;
     public static ArrayList<item> SpotifyPreBuf;
-    public static String[] firstList = {"radio","queue","Spotify","tv"};
+    public static String[] firstList = {"radio", "queue", "Spotify", "tv"};
     public static int firstListFlag = -1;
     public static Sonos sonos;
     public static frame gui;
     public static ArrayList<item> radioStationList;
     static Spotify spotify;
-    public static GpioPinDigitalInput ButtonLeft,ButtonRight,ButtonUp,ButtonDown,ButtonA,ButtonB,ButtonSelect,ButtonStart;
+    public static GpioPinDigitalInput ButtonLeft, ButtonRight, ButtonUp, ButtonDown, ButtonA, ButtonB, ButtonSelect, ButtonStart;
     public static GpioPinDigitalOutput ScreenPin;
     public static GpioController gpio;
-    public static String fullscreen = "";
+    public static boolean fullscreen = false;
     public static int debounceTime = 500;
     public static Timer screenTimer;
     public static boolean Pi4jActive = false;
+    public static final int defaultBatteryShutdownSOC = 3;
+    public static boolean wifiState = true;
+    public static ArrayList<Timer> timers;
+    public static boolean wifiManager=false;
+
     public static void main(String[] args) throws InterruptedException {
 
+//            Shutdown shutdown = new Shutdown();
+        try {
+            Runtime.getRuntime().addShutdownHook(new ShutdownThread());
+            System.out.println("[Main thread] Shutdown hook added");
+        } catch (Throwable t) {
+//             we get here when the program is run with java
+//             version 1.2.2 or older
+            System.out.println("[Main thread] Could not add Shutdown hook");
+        }
+        wifiOn();
+        timers = new ArrayList<>();
         System.getProperties().list(System.out);
-
-//        try {
-//            new systeminfoPrint();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
 //
+        try {
+            new systeminfoPrint();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         ipAddress = args[0];
         clientId = args[1];
         clientSecret = args[2];
         userid = args[3];
-        fullscreen = args[4];
+        if(args[4].contains("true")||args[4].contains("1")){
+            fullscreen=true;
+        }
+        if(args[5].contains("true")||args[5].contains("1")){
+            wifiManager=true;
+        }
 
 
-        spotify = new Spotify(clientId,clientSecret,userid);
+
+        spotify = new Spotify(clientId, clientSecret, userid);
         sonos = new Sonos(ipAddress);
         activeList = new ArrayList<>();
-        gpio=null;
+        gpio = null;
         sonos = new Sonos(ipAddress);
 
 
-        Timer timer = new Timer(5000, new ActionListener() {
+        Timer timer = new Timer(10000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Calendar cal = Calendar.getInstance();
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-                System.out.println( "time : "+sdf.format(cal.getTime()) );
+                System.out.println("time : " + sdf.format(cal.getTime()));
 
             }
         });
+        timers.add(timer);
         timer.start();
-
+//        Timer wifi = new Timer(90000, new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                if (wifiState) {
+//                    wifiOn();
+//                    wifiState = false;
+//                } else {
+//                    wifiOff();
+//                    wifiState = true;
+//                }
+//
+//            }
+//        });
+//        wifi.start();
 
 
         try {
+            queuePreBuf = sonos.BrowseQueue(0, 0, 0);
+            if(queuePreBuf==null){
+                queuePreBuf = new ArrayList<>();
 
-//         sonos.getTransportInfo();
-      //      sonos.setGroupVolume(55);
-
-      //      sonos.Next();
-
-          //  sonos.Stop();
-
-            //sonos.Previous();
-
-
-            //sonos.play();
-
-            queuePreBuf = sonos.BrowseQueue(0,0,0);
-
-
-
-
-            browse data =sonos.BrowseMusicFolders();
-
-            sonos.ItemAnalyser(data.container.get(0).containerId).get(0).print();
-       //     itemList = sonos.ItemAnalyser(data.container.get(0).containerId);
-          //  sonos.playUri(itemList.get(0));
-
-           /*
-            for(int i =0;i<itemList.size();i++){
-                gui.addItem(itemList.get(i).title);
             }
-*/
 
-
-         //   gui.clearList();
-
-           // itemList = sonos.BrowseRadioStations();
-        /*    for(int i =0;i<itemList.size();i++){
-                gui.addItem(itemList.get(i).title);
-            }*/
-
-
+            browse data = sonos.BrowseMusicFolders();
+            if(data!=null) {
+                sonos.ItemAnalyser(data.container.get(0).containerId).get(0).print();
+            }
             ui();
 
             setFirstListGui();
             gui.Infopanel.LoadingIconOFF();
-
-          // sonos.playSpotifyPlayList(SpotifiUser,SpotifiPlayList,SpotifyPlayListName);
-
-
-         /*   new Runnable() {
-                @Override
-                public void run() {
-                    DisplatOFF();
-
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    DisplatON();
-
-                }
-            }.run();
-
-*/
-
-
+//
         } catch (Exception e) {
-        e.printStackTrace();
-    }
-//        try {
-//            new VolumeControle();
-        SpotifyPreBuf = spotify.GetPublicPlayLists();
-        screenTimer = new Timer(60000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                ScreenPin.high();
-            }
-        });
-        screenTimer.start();
-        Thread.sleep(15000);
-//        try {
-//            new systeminfoPrint();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-        if(!System.getProperty("os.name").contains("Windows")){
-            Pi4jActive = true;
+            e.printStackTrace();
         }
         if(Pi4jActive) {
-            pi4jSetup();
-            LowPowerCalls.turnOffOnbordLeds();
-
-
+            try {
+                new VolumeControle();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (I2CFactory.UnsupportedBusNumberException e) {
+                e.printStackTrace();
+            }
         }
+        SpotifyPreBuf = spotify.GetPublicPlayLists();
+            screenTimer = new Timer(60000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (Pi4jActive){
+                        ScreenPin.high();
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+                   wifiOff();
+                }
+            }
+            });
+            timers.add(screenTimer);
+            screenTimer.start();
+            Thread.sleep(5000);
+            if (!System.getProperty("os.name").contains("Windows")) {
+                Pi4jActive = true;
+            }
+            if (Pi4jActive) {
+                pi4jSetup();
+                LowPowerCalls.turnOffOnbordLeds();
 
 
+            }
 
 
-
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (I2CFactory.UnsupportedBusNumberException e) {
-//            e.printStackTrace();
+//        while(true){
+//            Thread.sleep(10000);
 //        }
 
+    }
 
-//        Thread t = new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//
-//            }
-//        });
-//        t.run();
-        Shutdown shutdown = new Shutdown();
-        try {
-            Runtime.getRuntime().addShutdownHook(new ShutdownThread(shutdown));
-            System.out.println("[Main thread] Shutdown hook added");
-        } catch (Throwable t) {
-            // we get here when the program is run with java
-            // version 1.2.2 or older
-            System.out.println("[Main thread] Could not add Shutdown hook");
+
+
+
+    public static void wifiOff(){
+
+        if(Pi4jActive && wifiManager) {
+            wifiState = false;
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String[] args = new String[]{"/bin/bash", "-c", "sudo iwconfig wlan0 txpower off"};
+                    try {
+                        Process proc = new ProcessBuilder(args).start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("turning wifi off");
+                }
+            });
+            t.start();
         }
+    }
+    public static void wifiOn() {
 
-
+        if(Pi4jActive && wifiManager) {
+            wifiState = true;
+            Thread t = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String[] args = new String[]{"/bin/bash", "-c", "sudo iwconfig wlan0 txpower 1"};
+                    try {
+                        Process proc = new ProcessBuilder(args).start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("turning wifi on");
+                }
+            });
+            t.start();
+        }
     }
 
 
@@ -238,24 +249,27 @@ public class Main{
 
         try {
             max17043 max = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
-            max.setAlertThreshold(3);
+            max.clearAlertInterrupt();
+            max.setAlertThreshold(defaultBatteryShutdownSOC);
 
         } catch (IOException e) {
             e.printStackTrace();
         } catch (I2CFactory.UnsupportedBusNumberException e) {
             e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
 
-//        pi4jButtonLeftSetup(); // gpio 02
-//        pi4jButtonRightSetup(); // gpio 00
-//        pi4jButtonUpSetup(); // gpio 08
-//        pi4jButtonDownSetup(); // gpio 04
-//        pi4jButtonASetup(); //gpio 05
-//        pi4jButtonBSetup();
-//        pi4jButtonStartSetup(); // gpio 06
-//        pi4jButtonSelectSetup(); // gpio 07
-        pi4jScreenControler();
+        pi4jButtonLeftSetup(); // gpio 02
+        pi4jButtonRightSetup(); // gpio 00
+        pi4jButtonUpSetup(); // gpio 10
+        pi4jButtonDownSetup(); // gpio 04
+        pi4jButtonASetup(); //gpio 06
+        pi4jButtonBSetup(); // gpio 5
+        pi4jButtonStartSetup(); // gpio 11
+        pi4jButtonSelectSetup(); // gpio 07
+        pi4jScreenControler(); // gpio 8 and 9
 
 
 
@@ -267,7 +281,7 @@ public class Main{
     }
     private static void pi4jScreenControler() {
        ScreenPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01);
-       ScreenPin.setShutdownOptions(false);
+       ScreenPin.setShutdownOptions(true,PinState.LOW);
     }
 
     public static void pi4jButtonSelectSetup(){
@@ -296,7 +310,7 @@ public class Main{
         });
     }
     public static void pi4jButtonStartSetup(){
-        ButtonStart = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, PinPullResistance.PULL_DOWN);
+        ButtonStart = gpio.provisionDigitalInputPin(RaspiPin.GPIO_11, PinPullResistance.PULL_DOWN);
         ButtonStart.setShutdownOptions(true);
         ButtonStart.setDebounce(debounceTime);
         ButtonStart.addListener(new GpioPinListenerDigital() {
@@ -346,7 +360,7 @@ public class Main{
         });
     }
     public static void pi4jButtonASetup(){
-        ButtonA = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_DOWN);
+        ButtonA = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, PinPullResistance.PULL_DOWN);
         ButtonA.setShutdownOptions(true);
         ButtonA.setDebounce(debounceTime);
         ButtonA.addListener(new GpioPinListenerDigital() {
@@ -397,7 +411,7 @@ public class Main{
     }
     public static void pi4jButtonUpSetup(){
 //        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_08, PinPullResistance.PULL_DOWN);
-        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_08);
+        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_10);
         ButtonUp.setShutdownOptions(true);
         ButtonUp.setDebounce(debounceTime);
         ButtonUp.addListener(new GpioPinListenerDigital() {
@@ -529,12 +543,14 @@ public class Main{
         Thread t = new Thread(){
             @Override
             public void run() {
-                String[] newlist = new String[itemList.size()];
-                for(int i = 0;i< itemList.size();i++){
-                    newlist[i]=itemList.get(i).title;
+                if(itemList!=null) {
+                    String[] newlist = new String[itemList.size()];
+                    for (int i = 0; i < itemList.size(); i++) {
+                        newlist[i] = itemList.get(i).title;
+                    }
+                    activeList = itemList;
+                    frame.newList(newlist);
                 }
-                activeList = itemList;
-                frame.newList(newlist);
 
             }
         };
@@ -555,9 +571,9 @@ public class Main{
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             System.out.println("auto shutdown do to low battery to protect the battery");
             System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            String[] args = new String[] {"/bin/bash", "-c", "sudo shutdown"};
+            String[] args = new String[] {"/bin/bash", "-c", "sudo shutdown -h now"};
             Process proc = new ProcessBuilder(args).start();
-
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -583,13 +599,18 @@ public class Main{
     }
 
 
-    public static void getRadioList() {
+    public static boolean getRadioList() {
         try {
             activeList = sonos.BrowseRadioStations();
-            setNewGuiList(activeList);
-
+            if(activeList!=null) {
+                setNewGuiList(activeList);
+                return true;
+            }else {
+                return false;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return false;
     }
 }

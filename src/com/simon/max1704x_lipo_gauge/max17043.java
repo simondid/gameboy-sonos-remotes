@@ -3,14 +3,17 @@ package com.simon.max1704x_lipo_gauge;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
+import com.sun.org.apache.bcel.internal.generic.I2D;
 
 import java.io.IOException;
 
 /**
  * Created by simon on 4/2/2017.
+ * importent link for code referance
+ * https://github.com/awelters/LiPoFuelGauge/blob/master/MAX17043.cpp
  */
 public class max17043 {
-        private static I2CDevice device;
+    public static I2CDevice device;
 
     public static int address = 0x36;
 
@@ -22,11 +25,12 @@ public class max17043 {
     static byte CONFIG_REGISTER	=(byte)0x0C;
     static byte CONFIG_REGISTER_ATHRD_ADDR	=(byte)0x0D;
     static byte COMMAND_REGISTER= (byte) 0xFE;
+    static byte maxAlertTrue = (byte) 0x01;
     private I2CDevice getDevice(I2CBus i2c) throws IOException {
         I2CDevice device = i2c.getDevice(this.address);
         return device;
     }
-    public max17043(I2CBus i2c, int address) throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public max17043(I2CBus i2c, int address) throws IOException, I2CFactory.UnsupportedBusNumberException, InterruptedException {
         this.device = device;
         this.address = address;
         this.device = getDevice(i2c);
@@ -34,79 +38,81 @@ public class max17043 {
         if(!isSleeping(device)){
             sleep(device);
         }
-        clearAlertInterrupt(device);
+//        clearAlertInterrupt(device);
     }
-    public max17043(I2CBus i2c) throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public max17043(I2CBus i2c) throws IOException, I2CFactory.UnsupportedBusNumberException, InterruptedException {
 
         this.device = getDevice(i2c);
 
         if(!isSleeping(device)){
             sleep(device);
         }
-        
-        clearAlertInterrupt(device);
+
+//        clearAlertInterrupt(device);
     }
     public static boolean isSleeping(I2CDevice device) throws IOException {
 
         int b = (getStatus(device) & 0x80);
         if(b == 0x80){
-            System.out.println("checking if max17043 is sleeping : true" );
+//            System.out.println("checking if max17043 is sleeping : true" );
             return true;
         }else{
-            System.out.println("checking if max17043 is sleeping : false" );
+//            System.out.println("checking if max17043 is sleeping : false" );
             return false;
         }
 
     }
-    public static void reset() throws IOException {
+    public static void reset() throws IOException, InterruptedException {
         wake(device);
         reset(device);
         sleep(device);
 
     }
-    public static void QuickStart() throws IOException {
+    public static void QuickStart() throws IOException, InterruptedException {
         wake(device);
         QuickStart(device);
         sleep(device);
 
     }
-    public static int getVersion() throws IOException {
+    public static int getVersion() throws IOException, InterruptedException {
+
         wake(device);
+
         int version = GetVersion(device);
         sleep(device);
         return version;
     }
     public static double getSOC() throws IOException, InterruptedException {
-        if(isSleeping(device)) {
-            wake(device);
-        }
-      //  Thread.sleep(1000);
+
+        wake(device);
+
+//          Thread.sleep(1000);
         double SOC = getSoC(device);
 //        sleep(device);
         return SOC;
     }
     public double getVcell() throws IOException, InterruptedException {
         wake(this.device);
-        Thread.sleep(150);
+
         double vCell = getVCell(this.device);
         sleep(this.device);
         return vCell;
     }
-    public static int getAlertThreshold() throws IOException {
+    public static int getAlertThreshold() throws IOException, InterruptedException {
         wake(device);
 //        (32-(buffer[1]&0x1F))
         int thrs = (32-(getAlertThreshold(device)[1]&0x1F));
         sleep(device);
         return thrs;
     }
-    public static void setAlertThreshold(int AlertThreshold) throws IOException {
+    public static void setAlertThreshold(int AlertThreshold) throws IOException, InterruptedException {
         wake(device);
         setAlertThreshold(device,AlertThreshold);
         sleep(device);
 
     }
 
-    public static void clearAlertInterrupt(I2CDevice device) throws IOException {
+    public static void clearAlertInterrupt() throws IOException, InterruptedException {
         wake(device);
         byte comp = getCompensation(device);
         byte status = (byte) getStatus(device);
@@ -116,15 +122,135 @@ public class max17043 {
         device.write(buffer);
         sleep(device);
     }
-    private static void wake(I2CDevice device) throws IOException {
+    public static boolean getAlertTriggered() throws IOException, InterruptedException {
+        wake(device);
+
+//        System.out.println("get alter v2 out put : "+ getAlertV2(device));
+//        getAlertV3(device);
+        if(getAlertV3(device)){
+
+            sleep(device);
+            return true;
+        }
+//        getAlertV2(device);
+        return false;
+    }
+    //    private static boolean getAlert(I2CDevice device) throws IOException {
+//        System.out.println("getting alert state v2");
+//
+//        device.write(CONFIG_REGISTER);
+//
+//        byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
+//        int byteCount = 0;
+//        try
+//        {
+//            byteCount = device.read(buffer, 0, 2);
+//        }
+//        catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("msb : " + buffer[0] + "  : lsb :" +buffer[1]);
+//        byte lsb = (byte) (buffer[1]&0x20);
+//        System.out.println("lsb & 0x20 := " + lsb );
+//        byte msb = (byte) (buffer[0]&0x20);
+//        System.out.println("msb & 0x20 := " + msb);
+//        return false;
+//    }
+//    private static boolean getAlertV2(I2CDevice device) throws IOException {
+//        System.out.println("getting alert state");
+//
+//        device.write(CONFIG_REGISTER);
+//
+//        byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
+//        int byteCount = 0;
+//        try
+//        {
+//            byteCount = device.read(buffer, 0, 2);
+//        }
+//        catch (IOException e)
+//        {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("msb : " + buffer[0] + "  : lsb :" +buffer[1]);
+//        byte lsb = (byte) (buffer[1]&0x20);
+//        System.out.println("lsb & 0x20 := " + lsb );
+//        byte msb = (byte) (buffer[0]);
+//        System.out.println("msb & 0x20 := " + msb);
+//
+//
+//        System.out.println(((((buffer[0]<<8 )| buffer[1])) & (1<<6)));
+//        if(((((buffer[0]<<8 )| buffer[1])) & (1<<6))==1){
+//
+//            return true;
+//
+//        }
+//        return false;
+//    }
+    private static boolean getAlertV3(I2CDevice device) throws IOException {
+//        System.out.println("getting alert state v3");
+
+        device.write(CONFIG_REGISTER);
+
+        byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
+        int byteCount = 0;
+        try
+        {
+            byteCount = device.read(buffer, 0, 2);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+//        System.out.println("get alert v3 : = " +"msb : " + buffer[0] + "  : lsb :" +buffer[1]);
+//
+//
+//        System.out.println("v3 comparison : ");
+//        System.out.println((buffer[1] >>5 ) & 0x01);
+
+        if(((buffer[1] >>5 ) & 0x01)==maxAlertTrue){
+//            System.out.println("v3 returning true");
+            return true;
+
+        }
+//        System.out.println("v3 returning false");
+        return false;
+    }
+//    return ((uint16_t) msb << 8) | lsb;
+
+//    uint8_t MAX17043::getAlert(bool clear)
+//    {
+//         Read config reg, so we don't modify any other values:
+//        uint16_t configReg = read16(MAX17043_CONFIG);
+//        if (configReg & (1<<6))
+//        {
+//            if (clear) // If the clear flag is set
+//            {
+//                configReg &= ~(1<<6); // Clear ALRT bit manually.
+//                write16(configReg, MAX17043_CONFIG);
+//            }
+//            return 1;
+//        }
+//
+//        return 0;
+//    }
+
+
+    private static void wake(I2CDevice device) throws IOException, InterruptedException {
 //        System.out.println("waking max17043 device from sleep");
+        if(isSleeping(device)) {
 
-        byte comp = getCompensation(device);
-        byte thrd = getAlertThreshold(device)[1];
-        byte [] buffer = {CONFIG_REGISTER,comp, (byte) (0x7f & thrd)};
 
-        device.write(buffer);
+            byte comp = getCompensation(device);
+            byte thrd = getAlertThreshold(device)[1];
+            byte [] buffer = {CONFIG_REGISTER,comp, (byte) (0x7f & thrd)};
 
+            device.write(buffer);
+            Thread.sleep(505);
+        }
     }
 
     private static int getStatus(I2CDevice device) throws IOException {
@@ -149,7 +275,7 @@ public class max17043 {
         int byteCount = 0;
         try
         {
-            byteCount = device.read(buffer2, 0, 8);
+            byteCount = device.read(buffer2, 0, 2);
         }
         catch (IOException e)
         {
@@ -165,46 +291,7 @@ public class max17043 {
     }
 
 
-    private static boolean getAlert(I2CDevice device) throws IOException {
-        System.out.println("getting alert state");
-        System.out.println(" note working a 100% atm");
-//        byte[] buffer = {CONFIG_REGISTER,0,0};
-//        int response = device.read(CONFIG_REGISTER);
-//        System.out.println("config register response : " + response);
-//        byte b = (byte) ((byte)response & 0x20);
-//        System.out.println("modified output : " + b);
 
-
-        System.out.println("Getting alert trigger value version 2");
-
-
-        device.write(CONFIG_REGISTER);
-
-        byte buffer2[] = new byte[2];  // receive 16 bits (2 bytes)
-        int byteCount = 0;
-        try
-        {
-            byteCount = device.read(buffer2, 0, 8);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
-
-        System.out.println("msb : " + buffer2[0] + "  : lsb :" +buffer2[1]);
-
-        System.out.println("");
-        System.out.println(Integer.toBinaryString(buffer2[1]));
-        System.out.println(Integer.toBinaryString(buffer2[1]).charAt(2));
-        if(Integer.toBinaryString(buffer2[1]).charAt(2) =='1'){
-            System.out.println("alarm triggered");
-            return true;
-        }else {
-            System.out.println("alarm not triggered");
-            return false;
-        }
-    }
     protected static String bytesToHex(byte[] bytes) {
         final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
         char[] hexChars = new char[bytes.length * 2];
@@ -315,14 +402,14 @@ public class max17043 {
 
 
 
-    private static double getSoC(I2CDevice device) throws IOException {
+    private static double getSoC(I2CDevice device) throws IOException, InterruptedException {
 //        System.out.println("getting soc");
         int response = device.read(SOC_REGISTER);
 
 //        System.out.println("repsonse : "+String.format("0x%02x", response) + " raw response : " + response);
 
 //        System.out.println("getting device version // shut be version 4//");
-
+        Thread.sleep(10);
         device.write(SOC_REGISTER);
 
         byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
@@ -341,9 +428,58 @@ public class max17043 {
         double b = buffer[0]+(buffer[1] / 256.0);
 //        System.out.println("modified output : " + b);
 //        System.out.println("bytes to hex : " + bytesToHex(buffer));
-        System.out.println("getting new SOC");
+//        System.out.println("getting new SOC");
         return b;
     }
+    public static double getSoCv2(I2CDevice device) throws IOException, InterruptedException {
+//        System.out.println("getting soc");
+//        int response = device.read(SOC_REGISTER);
+
+//        System.out.println("repsonse : "+String.format("0x%02x", response) + " raw response : " + response);
+
+//        System.out.println("getting device version // shut be version 4//");
+        Thread.sleep(10);
+        device.write(SOC_REGISTER);
+
+        byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
+        int byteCount = 0;
+        try
+        {
+            byteCount = device.read(buffer, 0, 2);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
+        System.out.println("msb : " + buffer[0] + "  : lsb :" +buffer[1]);
+
+        float d = (float) ((((buffer[0]<<8) | buffer[1]) & 0xFF00) / 256.0);
+
+//        System.out.println("modified output : " + b);
+//        System.out.println("bytes to hex : " + bytesToHex(buffer));
+//        System.out.println("getting new SOC");
+        return d;
+    }
+
+//    uint16_t MAX17043::read16(uint8_t address)
+//    {
+//        uint8_t msb, lsb;
+//        int16_t timeout = 1000;
+//
+//        Wire.beginTransmission(MAX17043_ADDRESS);
+//        Wire.write(address);
+//        Wire.endTransmission(false);
+//
+//        Wire.requestFrom(MAX17043_ADDRESS, 2);
+//        while ((Wire.available() < 2) && (timeout-- > 0))
+//            delay(1);
+//        msb = Wire.read();
+//        lsb = Wire.read();
+//
+//        return ((uint16_t) msb << 8) | lsb;
+//    }
 
 
     private static double getVCell(I2CDevice device) throws IOException {

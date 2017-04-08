@@ -7,10 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 
 
@@ -142,67 +139,69 @@ public class Sonos {
         Main.getQueue();
     }
     public static browse Browse(String objectID,boolean BrowseFlag,String Filter,int StartingIndex,int RequestCount,String SortCiteria) throws IOException {
-        URL url = new URL("http://" + ipAdress + ":1400/MediaServer/ContentDirectory/Control");
-        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+        browse data = new browse();
+        try {
+            URL url = new URL("http://" + ipAdress + ":1400/MediaServer/ContentDirectory/Control");
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
 
-        request.setRequestMethod("POST");
-        request.addRequestProperty("SOAPACTION", "urn:schemas-upnp-org:service:ContentDirectory:1#Browse");
-        request.setDoOutput(true);
-        request.setReadTimeout(9000);
-
-
-        OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
-        String flag;
-        if(BrowseFlag){
-            flag = "BrowseDirectChildren";
-        }else{
-            flag = "BrowseMetadata";
-        }
-
-        input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-                "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
-                "   <s:Body>\n" +
-                "      <u:Browse xmlns:u=\"urn:schemas-upnp-org:service:ContentDirectory:1\">\n" +
-                "         <ObjectID>"+objectID+"</ObjectID>\n" +
-                "         <BrowseFlag>"+flag+"</BrowseFlag>\n" +
-                "        <Filter>"+Filter+"</Filter>"+
-                "         <StartingIndex>"+StartingIndex+"</StartingIndex>\n" +
-                "         <RequestedCount>"+RequestCount+"</RequestedCount>\n" +
-                "         <SortCriteria>"+SortCiteria+"</SortCriteria>\n" +
-                "      </u:Browse>\n" +
-                "   </s:Body>\n" +
-                "</s:Envelope>");
-        input.write("");
+            request.setRequestMethod("POST");
+            request.addRequestProperty("SOAPACTION", "urn:schemas-upnp-org:service:ContentDirectory:1#Browse");
+            request.setDoOutput(true);
+            request.setReadTimeout(9000);
 
 
+            OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
+            String flag;
+            if (BrowseFlag) {
+                flag = "BrowseDirectChildren";
+            } else {
+                flag = "BrowseMetadata";
+            }
+
+            input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                    "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                    "   <s:Body>\n" +
+                    "      <u:Browse xmlns:u=\"urn:schemas-upnp-org:service:ContentDirectory:1\">\n" +
+                    "         <ObjectID>" + objectID + "</ObjectID>\n" +
+                    "         <BrowseFlag>" + flag + "</BrowseFlag>\n" +
+                    "        <Filter>" + Filter + "</Filter>" +
+                    "         <StartingIndex>" + StartingIndex + "</StartingIndex>\n" +
+                    "         <RequestedCount>" + RequestCount + "</RequestedCount>\n" +
+                    "         <SortCriteria>" + SortCiteria + "</SortCriteria>\n" +
+                    "      </u:Browse>\n" +
+                    "   </s:Body>\n" +
+                    "</s:Envelope>");
+            input.write("");
 
 
-        input.flush();
+            input.flush();
 
 
-        BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
-        String oneResponse = new String();
-        String line;
-        while ((line = output.readLine()) != null) {
-            // oneResponse += line + "\r\n";
-            oneResponse +=line;
-        }
+            BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+            String oneResponse = new String();
+            String line;
+            while ((line = output.readLine()) != null) {
+                // oneResponse += line + "\r\n";
+                oneResponse += line;
+            }
 
 //        System.out.println(oneResponse);
 
-        browse data = new browse();
-        data.result = html2text(oneResponse.substring(oneResponse.indexOf("<Result>")+"<Result>".length(),oneResponse.indexOf("</Result>")));
-        //gettting NumberReturned
-        data.numberReturned= new Integer(oneResponse.substring(oneResponse.indexOf("<NumberReturned>")+"<NumberReturned>".length(),oneResponse.indexOf("</NumberReturned>")).toString());
-        //gettting TotalMatches
-        data.TotalMatches= new Integer(oneResponse.substring(oneResponse.indexOf("<TotalMatches>")+"<TotalMatches>".length(),oneResponse.indexOf("</TotalMatches>")).toString());
-        //gettting updateID
-        data.updateID= new Integer(oneResponse.substring(oneResponse.indexOf("<UpdateID>")+"<UpdateID>".length(),oneResponse.indexOf("</UpdateID>")).toString());
 
+            data.result = html2text(oneResponse.substring(oneResponse.indexOf("<Result>") + "<Result>".length(), oneResponse.indexOf("</Result>")));
+            //gettting NumberReturned
+            data.numberReturned = new Integer(oneResponse.substring(oneResponse.indexOf("<NumberReturned>") + "<NumberReturned>".length(), oneResponse.indexOf("</NumberReturned>")).toString());
+            //gettting TotalMatches
+            data.TotalMatches = new Integer(oneResponse.substring(oneResponse.indexOf("<TotalMatches>") + "<TotalMatches>".length(), oneResponse.indexOf("</TotalMatches>")).toString());
+            //gettting updateID
+            data.updateID = new Integer(oneResponse.substring(oneResponse.indexOf("<UpdateID>") + "<UpdateID>".length(), oneResponse.indexOf("</UpdateID>")).toString());
+        }catch (SocketException e){
+            return null;
+        }
         return data;
     }
 
-    public static ArrayList<item> ItemAnalyser(String Container) throws IOException {
+    public static ArrayList<item> ItemAnalyser(String Container) throws IOException,SocketException {
         int maxSize =1;
         int StartingIndex =0;
         ArrayList<item> list = new ArrayList<>();
@@ -216,6 +215,9 @@ public class Sonos {
 
 
             browse input = Browse(objectid, BrowseFlag, Filter, StartingIndex, RequestCount, SortCiteria);
+            if(input==null){
+                return null;
+            }
             int matchesCount = input.TotalMatches;
 
             System.out.println
@@ -337,6 +339,9 @@ public class Sonos {
         String SortCiteria ="";
 
         browse input = Browse(objectid,BrowseFlag,Filter,StartingIndex,RequestCount,SortCiteria);
+        if(input==null){
+            return null;
+        }
         System.out.print("");
         String result = input.result;
 //        System.out.println(result);
@@ -413,9 +418,9 @@ public class Sonos {
 
         String result = input.result;
 */
-        ArrayList<item> l = ItemAnalyser("R:0/0");
+        ArrayList<item> list= ItemAnalyser("R:0/0");
 
-        return l;
+        return list;
 
         /*
         System.out.println("result32");
@@ -499,7 +504,7 @@ public class Sonos {
        // data.print();
     }
 
-    public static ArrayList<item> BrowseQueue(int QueueID, int StartingIndex, int RequestedCount) throws IOException {
+    public static ArrayList<item> BrowseQueue(int QueueID, int StartingIndex, int RequestedCount) throws IOException,SocketException {
         System.out.println
                 (new Exception().getStackTrace()[0].getMethodName());
 /*

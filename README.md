@@ -14,8 +14,9 @@ clientid = spotify client id
 clientsecretkey = spotify client secret key
 userid = username
 fullscreen mode = true ore false
+wifiManger (turns wifi on and off in sleep mode) = true ore false
 
-java -jar gameboy-sonos-remotes sonosip clientid clientsecretKey userid
+java -jar gameboy-sonos-remotes sonosip clientid clientsecretKey userid wifiManger
 ```
 ### setup off 3.5 inc tft screen
 
@@ -124,3 +125,37 @@ https://github.com/simondid/MAX17043
 
 
 ![battery circuit](http://i65.tinypic.com/xdf0wi.png "battery circuit")
+
+
+# optional
+
+## power saving
+
+### cpu throttling / dynamic cpu speed
+
+powersvaings uncorfirmed
+
+in /boot/config.txt
+
+force_turbo=0
+arm_freq_min=200
+
+^makes the cpu switch between default cpy speed and the value off arm_freq_min
+
+http://with-raspberrypi.blogspot.dk/2014/03/cpu-frequency.html
+
+### wifi on and off
+
+power svaings messured with low accuracy but around 3 ma
+
+this is included in the program and is enabled bay default
+
+see post bay "yavuzaksan"
+
+wifi off
+sudo iwconfig wlan0 txpower off
+
+wifi on
+sudo iwconfig wlan0 txpower 1
+
+http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3

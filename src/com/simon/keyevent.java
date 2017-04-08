@@ -58,6 +58,7 @@ public class keyevent implements KeyListener {
         System.out.println("screen timer reset");
 //        if(Main.ScreenPin.isLow()) {
         if(Main.Pi4jActive) {
+            Main.wifiOn();
             Main.ScreenPin.low();
             Main.screenTimer.restart();
         }
@@ -75,8 +76,11 @@ public class keyevent implements KeyListener {
                 switch (frame.listPanel.list.getSelectedIndex()) {
                     case 0:
 
-                        Main.firstListFlag =0;
-                        Main.getRadioList();
+
+                        if(Main.getRadioList()) {
+
+                            Main.firstListFlag = 0;
+                        }
                         break;
                     case 1:
                         Main.firstListFlag =1;
@@ -91,7 +95,7 @@ public class keyevent implements KeyListener {
                             sonos.SetTvAsInput();
                             sonos.play();
                         } catch (IOException e1) {
-                            e1.printStackTrace();
+
                         }
                         break;
 
