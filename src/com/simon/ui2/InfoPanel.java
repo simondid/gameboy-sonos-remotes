@@ -198,22 +198,28 @@ public class InfoPanel extends JPanel {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
+                            double d =-1.0;
                             if (Main.Pi4jActive) {
+                                System.out.println("screen pin : " +Main.ScreenPin.getState());
+                                if(Main.ScreenPin.getState()==PinState.LOW) {
                                 try {
-                                    max17043 cp = null;
-                                    try {
-                                        cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
-                                    } catch (IOException e1) {
-                                        e1.printStackTrace();
-                                    } catch (I2CFactory.UnsupportedBusNumberException e1) {
-                                        e1.printStackTrace();
-                                    }
 
-                                    double d = soc = cp.getSOC();
-                                    if(cp.getAlertTriggered()){
-                                        Main.shutdown();
-                                    }
+                                        max17043 cp = null;
+                                        try {
+                                            cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        } catch (I2CFactory.UnsupportedBusNumberException e1) {
+                                            e1.printStackTrace();
+                                        }
+
+                                        d = soc = cp.getSOC();
+                                        if (cp.getAlertTriggered()) {
+                                            Main.shutdown();
+                                        }
+
 //                                    System.out.println("SOC : " + d);
+                                    double finalD = d;
                                     SwingUtilities.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
@@ -221,10 +227,8 @@ public class InfoPanel extends JPanel {
                                             SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 //                                            System.out.println( "time : "+sdf.format(cal.getTime()) );
 
-                                            Battery.setText(format.format(d) + "%");
+                                            Battery.setText(format.format(finalD) + "%");
                                             System.out.println("updaing battery state SOC = " + format.format(soc) + " ; " + sdf.format(cal.getTime()));
-
-
                                         }
                                     });
 
@@ -233,11 +237,12 @@ public class InfoPanel extends JPanel {
                                 } catch (InterruptedException e1) {
                                     e1.printStackTrace();
                                 }
+                                }
                             }else {
                                 Battery.setText("N/A");
                             }
-                        }
 
+                    }
                     });
         }});
         Main.timers.add(bms);

@@ -67,6 +67,10 @@ add to autostart file
 ```sh
 @lxterminal
 ```
+fixing lxterminal window size
+```sh
+@lxterminal --geometry=39x9
+```
 
 then edit
 ```sh
@@ -107,14 +111,24 @@ lipo fuel gauge max 17043
 ## electronics wiring
 
 ### screen on / off controler
+new cercuit
+
+http://www.mouser.com/ds/2/149/FQP47P06-1009447.pdf
+http://i63.tinypic.com/21e9aw2.jpg
+
+
+![screen on / off controler](http://i63.tinypic.com/21e9aw2.jpg "screen on / off controler")
+
+```
+old screen controler circuit
+
 http://i63.tinypic.com/11jc6mq.png
 http://electronics.stackexchange.com/questions/233205/npn-transistor-to-run-12v-0-5a-from-3-3v-4ma
 
 gpio 1 aka pin 12 on the raspberry pi model b
 
 ![screen on / off controler](http://i63.tinypic.com/11jc6mq.png "screen on / off controler")
-
-
+```
 ### battery management circuit based on the max17043 lipo fuel gauge
 http://i65.tinypic.com/xdf0wi.png
 https://github.com/simondid/MAX17043
