@@ -113,6 +113,8 @@ lipo fuel gauge max 17043
 ### screen on / off controler
 new cercuit
 
+using a fqp47p06
+
 http://www.mouser.com/ds/2/149/FQP47P06-1009447.pdf
 http://i63.tinypic.com/21e9aw2.jpg
 
