@@ -43,8 +43,9 @@ public class Main {
     public static ArrayList<item> queuePreBuf;
     public static ArrayList<item> SpotifyPreBuf;
     public static String[] firstList = {"radio", "queue", "Spotify", "tv"};
-    public static int firstListFlag = -1;
-    public static Sonos sonos;
+    public static ArrayList<deviceDescription> deviceList;
+    public static int firstListFlag = -2;
+    public static Sonos sonos = null;
     public static frame gui;
     public static ArrayList<item> radioStationList;
     static Spotify spotify;
@@ -59,9 +60,9 @@ public class Main {
     public static boolean wifiState = true;
     public static ArrayList<Timer> timers;
     public static boolean wifiManager=false;
-
+    public static Thread DeviceLisenter;
     public static void main(String[] args) throws InterruptedException {
-
+        timers = new ArrayList<>();
 //            Shutdown shutdown = new Shutdown();
         try {
             Runtime.getRuntime().addShutdownHook(new ShutdownThread());
@@ -71,8 +72,14 @@ public class Main {
 //             version 1.2.2 or older
             System.out.println("[Main thread] Could not add Shutdown hook");
         }
+        ui();
+        Thread.sleep(5000);
+        setFirstListGui();
+        gui.Infopanel.LoadingIconOFF();
+
         wifiOn();
-        timers = new ArrayList<>();
+
+
         System.getProperties().list(System.out);
 //
         try {
@@ -83,24 +90,24 @@ public class Main {
             e.printStackTrace();
         }
 
-        ipAddress = args[0];
-        clientId = args[1];
-        clientSecret = args[2];
-        userid = args[3];
-        if(args[4].contains("true")||args[4].contains("1")){
+//        ipAddress = args[0];
+        clientId = args[0];
+        clientSecret = args[1];
+        userid = args[2];
+        if(args[3].contains("true")||args[3].contains("1")){
             fullscreen=true;
         }
-        if(args[5].contains("true")||args[5].contains("1")){
+        if(args[4].contains("true")||args[4].contains("1")){
             wifiManager=true;
         }
 
 
 
         spotify = new Spotify(clientId, clientSecret, userid);
-        sonos = new Sonos(ipAddress);
+
         activeList = new ArrayList<>();
         gpio = null;
-        sonos = new Sonos(ipAddress);
+
 
 
         Timer timer = new Timer(10000, new ActionListener() {
@@ -131,20 +138,8 @@ public class Main {
 
 
         try {
-            queuePreBuf = sonos.BrowseQueue(0, 0, 0);
-            if(queuePreBuf==null){
-                queuePreBuf = new ArrayList<>();
+            updateDevicelink();
 
-            }
-
-            browse data = sonos.BrowseMusicFolders();
-            if(data!=null) {
-                sonos.ItemAnalyser(data.container.get(0).containerId).get(0).print();
-            }
-            ui();
-
-            setFirstListGui();
-            gui.Infopanel.LoadingIconOFF();
 //
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,7 +153,7 @@ public class Main {
                 e.printStackTrace();
             }
         }
-        SpotifyPreBuf = spotify.GetPublicPlayLists();
+
             screenTimer = new Timer(60000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -193,7 +188,36 @@ public class Main {
 
     }
 
+    public static void updateDevicelink() {
+        DeviceLisenter = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                gui.Infopanel.LoadingIconON();
+                Upnp_Discover discover = new Upnp_Discover();
+                discover.start();
+                while(discover.isAlive()){
+                    ArrayList<deviceDescription> list = discover.getDevices();
+                    for(int i =0;i<list.size();i++){
+                        System.out.println("returned stuff : "+list.get(i).getIp());
+                        setNewGuiListDevices(list);
+                    }
+                    try {
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                ArrayList<deviceDescription> list = discover.getDevices();
+                for(int i =0;i<list.size();i++){
+                    System.out.println("returned stuff : "+list.get(i).getIp());
+                    setNewGuiListDevices(list);
+                }
+                gui.Infopanel.LoadingIconOFF();
+            }
 
+        });
+        DeviceLisenter.start();
+    }
 
 
     public static void wifiOff(){
@@ -297,9 +321,9 @@ public class Main {
                 try {
                     Robot  r = new Robot();
                     if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_LEFT);
+                        r.keyPress(KeyEvent.VK_D);
                     }else {
-                        r.keyRelease(KeyEvent.VK_LEFT);
+                        r.keyRelease(KeyEvent.VK_D);
                     }
                 } catch (AWTException e) {
                     e.printStackTrace();
@@ -322,9 +346,9 @@ public class Main {
                 try {
                     Robot  r = new Robot();
                     if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_LEFT);
+                        r.keyPress(KeyEvent.VK_S);
                     }else {
-                        r.keyRelease(KeyEvent.VK_LEFT);
+                        r.keyRelease(KeyEvent.VK_S);
                     }
                 } catch (AWTException e) {
                     e.printStackTrace();
@@ -508,7 +532,7 @@ public class Main {
     public static void getQueue() {
         setNewGuiList(queuePreBuf);
 
-        Sonos s = new Sonos(ipAddress);
+        Sonos s = sonos;
 
             Thread t = new Thread() {
                 @Override
@@ -557,12 +581,35 @@ public class Main {
 
         t.start();
     }
+    public static void setNewGuiListDevices(ArrayList<deviceDescription> itemList) {
+        Thread t = new Thread(){
+            @Override
+            public void run() {
+                if(itemList!=null) {
+                    String[] newlist = new String[itemList.size()];
+                    for (int i = 0; i < itemList.size(); i++) {
+                        newlist[i] = itemList.get(i).ip;
+                    }
+                    deviceList = itemList;
+                    frame.newList(newlist);
+                }
+
+            }
+        };
+
+        t.start();
+    }
 
     public static void setFirstListGui() {
 
-        frame.newList(firstList);
+//        frame.newList(firstList);
+        setNewGuiListDevices(deviceList);
     }
+    public static void setSecondListGui() {
 
+        frame.newList(firstList);
+//        setNewGuiListDevices(deviceList);
+    }
     public static void shutdown(){
         try {
             gpio.shutdown();
@@ -612,5 +659,39 @@ public class Main {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static void updateSonosLink(String ip) {
+        Main.ipAddress = ip;
+        gui.Infopanel.LoadingIconON();
+        sonos = new Sonos(ipAddress);
+        preBuf();
+
+    }
+    private static void preBuf(){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    queuePreBuf = sonos.BrowseQueue(0, 0, 0);
+
+                    if(queuePreBuf==null){
+                        queuePreBuf = new ArrayList<>();
+
+                    }
+
+                    browse data = sonos.BrowseMusicFolders();
+                    if(data!=null) {
+                        sonos.ItemAnalyser(data.container.get(0).containerId).get(0).print();
+                    }
+                    SpotifyPreBuf = spotify.GetPublicPlayLists();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                gui.Infopanel.LoadingIconOFF();
+            }
+        });
+        t.start();
+
     }
 }

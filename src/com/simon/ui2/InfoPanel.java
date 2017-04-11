@@ -329,21 +329,23 @@ public class InfoPanel extends JPanel {
 
         @Override
         public Void call() throws Exception {
-            Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-            Sonos s = new Sonos(Main.ipAddress);
+            if(Main.sonos!=null) {
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                Sonos s = new Sonos(Main.ipAddress);
 
-            Sonos.posisitionInfo data = s.getPosistionInfo();
-            if(data!=null) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        pb.setMaximum(timeformatToInt(data.Duratation));
-                        pb.setValue(timeformatToInt(data.RelTime));
+                Sonos.posisitionInfo data = s.getPosistionInfo();
+                if (data != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            pb.setMaximum(timeformatToInt(data.Duratation));
+                            pb.setValue(timeformatToInt(data.RelTime));
 //                    pb.setString(Main.activeList.get(data.track).title);
-                        title.setText(Main.queuePreBuf.get(data.track - 1).title);
-                        updatInfoPanel(Main.queuePreBuf.get(data.track - 1));
-                    }
-                });
+                            title.setText(Main.queuePreBuf.get(data.track - 1).title);
+                            updatInfoPanel(Main.queuePreBuf.get(data.track - 1));
+                        }
+                    });
+                }
             }
             return null;
         }
@@ -354,10 +356,15 @@ public class InfoPanel extends JPanel {
         @Override
         public Boolean call() throws Exception {
             Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-            Sonos s = new Sonos(Main.ipAddress);
 
-            boolean data = s.getTransportInfo();
-            return data;
+//            Sonos s = new Sonos(Main.ipAddress);
+
+            if(Main.sonos!=null) {
+                boolean data = Main.sonos.getTransportInfo();
+//                String d = "";
+                return data;
+            }
+            return false;
 
 
         }

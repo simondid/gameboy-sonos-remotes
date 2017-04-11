@@ -45,13 +45,18 @@ public class keyevent implements KeyListener {
 
         }
         if(e.getKeyCode()==KeyEvent.VK_LEFT){
-            Main.setFirstListGui();
+            Main.setSecondListGui();
             Main.firstListFlag =-1;
         }
         if(e.getKeyCode()==KeyEvent.VK_RIGHT||e.getKeyCode()==KeyEvent.VK_ENTER) {
 
                 selectionHandler();
 
+        }
+        if(e.getKeyCode()==KeyEvent.VK_S||e.getKeyCode()==KeyEvent.VK_S){
+            Main.updateDevicelink();
+            Main.setFirstListGui();
+            Main.firstListFlag = -2;
         }
     }
     private static void screenhandler(){
@@ -70,6 +75,13 @@ public class keyevent implements KeyListener {
         screenhandler();
         System.out.println("index : "+Main.gui.listPanel.list.getSelectedIndex() + " flag : "+ Main.firstListFlag);
         switch (Main.firstListFlag){
+            case -2:
+                Main.DeviceLisenter.stop();
+//                Main.ipAddress = Main.deviceList.get(Main.gui.listPanel.list.getSelectedIndex()).getIp();
+                Main.updateSonosLink(Main.deviceList.get(Main.gui.listPanel.list.getSelectedIndex()).getIp());
+                Main.setSecondListGui();
+                Main.firstListFlag = -1;
+                break;
             case -1:
 
                 System.out.println("first list action");

@@ -9,14 +9,13 @@
 ### running the jar
 ```sh
 to run the jar
-sonos ip = ip addres
 clientid = spotify client id
 clientsecretkey = spotify client secret key
 userid = username
 fullscreen mode = true ore false
 wifiManger (turns wifi on and off in sleep mode) = true ore false
 
-java -jar gameboy-sonos-remotes sonosip clientid clientsecretKey userid wifiManger
+java -jar gameboy-sonos-remotes clientid clientsecretKey userid wifiManger
 ```
 ### setup off 3.5 inc tft screen
 

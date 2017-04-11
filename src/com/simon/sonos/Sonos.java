@@ -1,13 +1,14 @@
 package com.simon.sonos;
 
-import com.simon.Main;
 import org.jsoup.Jsoup;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.*;
+import java.net.HttpURLConnection;
+import java.net.SocketException;
+import java.net.URL;
 import java.util.ArrayList;
 
 
@@ -39,6 +40,7 @@ public void print(){
 }
 
 }
+
 class trackData{
     String name,creator,album,enqueuedURI,itemID,parentID;
     String duration;
@@ -136,9 +138,9 @@ public class Sonos {
         }
 //        System.out.println(oneResponse);
 
-        Main.getQueue();
+//        Main.getQueue();
     }
-    public static browse Browse(String objectID,boolean BrowseFlag,String Filter,int StartingIndex,int RequestCount,String SortCiteria) throws IOException {
+    public static browse Browse(String objectID, boolean BrowseFlag, String Filter, int StartingIndex, int RequestCount, String SortCiteria) throws IOException {
         browse data = new browse();
         try {
             URL url = new URL("http://" + ipAdress + ":1400/MediaServer/ContentDirectory/Control");
@@ -1183,7 +1185,7 @@ public class Sonos {
 
         return false;
     }
-    public static void SetAvTransportURI(item  item) throws IOException {
+    public static void SetAvTransportURI(item item) throws IOException {
         System.out.println
                 (new Exception().getStackTrace()[0].getMethodName());
 

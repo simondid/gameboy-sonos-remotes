@@ -69,46 +69,75 @@ public class max17043 {
 
     }
     public static void QuickStart() throws IOException, InterruptedException {
-        wake(device);
-        QuickStart(device);
-        sleep(device);
+        if(wake(device)==1) {
+            QuickStart(device);
+            sleep(device);
+        }else{
+            errorMessage(new Exception().getStackTrace()[0].getMethodName());
+
+        }
 
     }
+
+    private static void errorMessage(String methodName) {
+        System.out.println("i2c Error max17043 in function : " +methodName);
+    }
+
     public static int getVersion() throws IOException, InterruptedException {
 
-        wake(device);
+        if(wake(device)==1) {
 
-        int version = GetVersion(device);
-        sleep(device);
-        return version;
+            int version = GetVersion(device);
+            sleep(device);
+            return version;
+        }else {
+            return -1;
+        }
     }
     public static double getSOC() throws IOException, InterruptedException {
 
-        wake(device);
+        if(wake(device)==1) {
 
 //          Thread.sleep(1000);
-        double SOC = getSoC(device);
+            double SOC = getSoC(device);
 //        sleep(device);
-        return SOC;
+            return SOC;
+        }else{
+            return -1;
+        }
     }
     public double getVcell() throws IOException, InterruptedException {
-        wake(this.device);
+        if(wake(this.device)==1) {
 
-        double vCell = getVCell(this.device);
-        sleep(this.device);
-        return vCell;
+            double vCell = getVCell(this.device);
+            sleep(this.device);
+            return vCell;
+        }else{
+            return -1;
+        }
+
     }
-    public static int getAlertThreshold() throws IOException, InterruptedException {
-        wake(device);
+    public static int getAlertThreshold() throws InterruptedException, IOException {
+        int thrs = -1;
+
+        if(wake(device)==1) {
 //        (32-(buffer[1]&0x1F))
-        int thrs = (32-(getAlertThreshold(device)[1]&0x1F));
-        sleep(device);
-        return thrs;
+
+            thrs = (32 - (getAlertThreshold(device)[1] & 0x1F));
+            sleep(device);
+
+            return thrs;
+        }else {
+            errorMessage(new Exception().getStackTrace()[0].getMethodName());
+            return -1;
+        }
+
     }
     public static void setAlertThreshold(int AlertThreshold) throws IOException, InterruptedException {
-        wake(device);
-        setAlertThreshold(device,AlertThreshold);
-        sleep(device);
+        if(wake(device)==1) {
+            setAlertThreshold(device, AlertThreshold);
+            sleep(device);
+        }
 
     }
 
@@ -189,10 +218,16 @@ public class max17043 {
 //        }
 //        return false;
 //    }
-    private static boolean getAlertV3(I2CDevice device) throws IOException {
+    private static boolean getAlertV3(I2CDevice device) {
 //        System.out.println("getting alert state v3");
+        try {
+            device.write(CONFIG_REGISTER);
+        }catch (IOException e){
+            //e.printStackTrace();
+            errorMessage(new Exception().getStackTrace()[0].getMethodName());
+            return false;
+        }
 
-        device.write(CONFIG_REGISTER);
 
         byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
         int byteCount = 0;
@@ -239,23 +274,38 @@ public class max17043 {
 //    }
 
 
-    private static void wake(I2CDevice device) throws IOException, InterruptedException {
+    private static int wake(I2CDevice device) throws IOException, InterruptedException {
 //        System.out.println("waking max17043 device from sleep");
         if(isSleeping(device)) {
-
-
-            byte comp = getCompensation(device);
-            byte thrd = getAlertThreshold(device)[1];
+            byte comp,thrd;
+            try {
+                comp = getCompensation(device);
+                thrd = getAlertThreshold(device)[1];
+            }catch (NullPointerException e){
+                return -1;
+            }
             byte [] buffer = {CONFIG_REGISTER,comp, (byte) (0x7f & thrd)};
 
             device.write(buffer);
             Thread.sleep(505);
+            if(comp==(byte)-1 || thrd == (byte) -1){
+                System.out.println("Error unable to connect to i2c device Max17043");
+                return -1;
+            }
+            return 1;
         }
+        return 1;
+
     }
 
     private static int getStatus(I2CDevice device) throws IOException {
         byte [] buffer = {CONFIG_REGISTER_ATHRD_ADDR};
-        device.write(buffer);
+        try {
+            device.write(buffer);
+        }catch (IOException e){
+            return -1;
+        }
+
         return device.read();
     }
     private static void sleep(I2CDevice device) throws IOException {
@@ -267,10 +317,15 @@ public class max17043 {
 
         device.write(buffer);
     }
-    private static byte getCompensation(I2CDevice device) throws IOException {
+    private static byte getCompensation(I2CDevice device){
 
         byte [] buffer = {CONFIG_REGISTER};
-        device.write(buffer);
+        try {
+            device.write(buffer);
+        }catch (IOException e){
+            return -1;
+        }
+
         byte buffer2[] = new byte[2];  // receive 16 bits (2 bytes)
         int byteCount = 0;
         try
@@ -333,10 +388,15 @@ public class max17043 {
 
         return b;
     }
-    private static byte[] getAlertThreshold(I2CDevice device) throws IOException {
+    private static byte[] getAlertThreshold(I2CDevice device) {
 //        System.out.println("getting device getAlertThreshold // shut be version 4//");
 
-        device.write(CONFIG_REGISTER);
+        try {
+            device.write(CONFIG_REGISTER);
+        }catch (IOException e){
+            return null;
+        }
+
 
         byte buffer[] = new byte[2];  // receive 16 bits (2 bytes)
         int byteCount = 0;
@@ -375,7 +435,7 @@ public class max17043 {
 
 
     }
-    private static void setAlertThreshold(I2CDevice device, int threshold) throws IOException {
+    private static int setAlertThreshold(I2CDevice device, int threshold) throws IOException {
 //        System.out.println("Setting the alert threadhold to : " + threshold + "% // default level is 4%//");
 //        System.out.println("dos not work atm ");
 
@@ -385,10 +445,15 @@ public class max17043 {
         int newthreshold = 32 - threshold;
 
 //        System.out.println("newthreashold value :" + newthreshold   );
-        writeRegister(CONFIG_REGISTER,newthreshold,device);
+
+        if(writeRegister(CONFIG_REGISTER,newthreshold,device)==1){
+            return 1;
+        }else{
+            return -1;
+        }
 
     }
-    protected static void writeRegister(int register, int value , I2CDevice device) throws IOException {
+    protected static int writeRegister(int register, int value , I2CDevice device) {
 
         // create packet in data buffer
         byte packet[] = new byte[3];
@@ -397,7 +462,15 @@ public class max17043 {
         packet[2] = (byte)(value & 0xFF); // value LSB
 
         // write data to I2C device
-        device.write(packet, 0, 3);
+
+        try {
+            device.write(packet, 0, 3);
+        } catch (IOException e) {
+
+            errorMessage(new Exception().getStackTrace()[0].getMethodName());
+            return -1;
+        }
+        return 1;
     }
 
 
