@@ -22,6 +22,7 @@ java -jar gameboy-sonos-remotes clientid clientsecretKey userid wifiManger
 ```sh
 screen setup
 
+
 cd /boot
 sudo nano config.txt
 
