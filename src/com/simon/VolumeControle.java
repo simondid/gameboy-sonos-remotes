@@ -19,9 +19,19 @@ import java.text.DecimalFormat;
  */
 public class VolumeControle {
     double deviceVoltage=0.0;
-    public VolumeControle()  throws IOException, I2CFactory.UnsupportedBusNumberException{{
-        System.out.println("<--Pi4J--> ADS1115 GPIO Example ... started.");
+    public VolumeControle(boolean pi4jActive)  throws IOException, I2CFactory.UnsupportedBusNumberException{
 
+
+
+        if(pi4jActive) {
+            pi4j();
+        }
+
+
+    }
+
+    private void pi4j() throws IOException, I2CFactory.UnsupportedBusNumberException {
+        System.out.println("<--Pi4J--> ADS1115 GPIO Example ... started.");
         // number formatters
         final DecimalFormat df = new DecimalFormat("#.##");
         final DecimalFormat pdf = new DecimalFormat("###.#");
@@ -120,5 +130,6 @@ public class VolumeControle {
         System.out.println("Exiting ADS1115GpioExample");
     }
 
-    }
+
 }
+

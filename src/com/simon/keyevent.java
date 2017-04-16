@@ -6,12 +6,16 @@ import com.simon.ui.gui2;
 import com.simon.ui2.frame;
 import com.simon.ui2.listPanel;
 
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
+
 
 /**
  * Created by simon on 3/6/2017.
@@ -19,6 +23,9 @@ import java.util.Set;
 public class keyevent implements KeyListener {
     private final Set<Character> pressed = new HashSet<Character>();
     static Sonos sonos;
+    private boolean VolLeverTimer = false;
+    Timer VolLevelChangeTimer;
+    int volume =-1;
     public keyevent() {
     }
 
@@ -35,36 +42,182 @@ public class keyevent implements KeyListener {
 
         sonos = Main.sonos;
 
+        System.out.println("keyEvent =" + e.getKeyCode());
 
-        if(e.getKeyCode()==KeyEvent.VK_C){
-            try {
-                sonos.RemoveAllTracks();
-            } catch (IOException e1) {
-                e1.printStackTrace();
+
+        VolLevelChangeTimer = new Timer(30000, new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                VolLeverTimer = false;
+//                System.out.println(VolLeverTimer);
             }
+        });
+        VolLevelChangeTimer.setRepeats(false);
 
-        }
-        if(e.getKeyCode()==KeyEvent.VK_LEFT){
-            Main.setSecondListGui();
-            Main.firstListFlag =-1;
-        }
-        if(e.getKeyCode()==KeyEvent.VK_RIGHT||e.getKeyCode()==KeyEvent.VK_ENTER) {
 
+
+
+
+
+        switch (e.getKeyCode()){
+            case KeyEvent.VK_C:
+                try {
+                    sonos.RemoveAllTracks();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                break;
+            case KeyEvent.VK_LEFT:
+                Main.setSecondListGui();
+                Main.firstListFlag =-1;
+                break;
+            case KeyEvent.VK_RIGHT:
                 selectionHandler();
+                break;
+            case KeyEvent.VK_ENTER:
+                selectionHandler();
+                break;
+            case KeyEvent.VK_S:
+                Main.updateDevicelink();
+                Main.setFirstListGui();
+                Main.firstListFlag = -2;
+                break;
+            case KeyEvent.VK_PLUS:
+
+                try {
+
+                    if(VolLeverTimer) {
+                        setGroupVolume(5);
+
+                    }else{
+
+                        volume = sonos.getGroupVolume(0)+5;
+                        sonos.setGroupVolume(volume);
+                        VolLeverTimer=true;
+                        VolLevelChangeTimer.start();
+                    }
+
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                break;
+            case KeyEvent.VK_ADD:
+
+                try {
+
+                    if(VolLeverTimer) {
+                        setGroupVolume(5);
+
+                    }else{
+
+                        volume = sonos.getGroupVolume(0)+5;
+                        sonos.setGroupVolume(volume);
+                        VolLeverTimer=true;
+                        VolLevelChangeTimer.start();
+                    }
+
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }                break;
+            case KeyEvent.VK_MINUS:
+                try {
+
+                    if(VolLeverTimer) {
+                        setGroupVolume(-5);
+
+                    }else{
+
+                        volume = sonos.getGroupVolume(0)-2;
+                        sonos.setGroupVolume(volume);
+                        VolLeverTimer=true;
+                        VolLevelChangeTimer.start();
+                    }
+
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                case KeyEvent.VK_SUBTRACT:
+                    try {
+
+                        if(VolLeverTimer) {
+                            setGroupVolume(-5);
+
+                        }else{
+
+                            volume = sonos.getGroupVolume(0)-2;
+                            sonos.setGroupVolume(volume);
+                            VolLeverTimer=true;
+                            VolLevelChangeTimer.start();
+                        }
+
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                 break;
 
         }
-        if(e.getKeyCode()==KeyEvent.VK_S||e.getKeyCode()==KeyEvent.VK_S){
-            Main.updateDevicelink();
-            Main.setFirstListGui();
-            Main.firstListFlag = -2;
+
+//        if(e.getKeyCode()==KeyEvent.VK_C){
+//            try {
+//                sonos.RemoveAllTracks();
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
+//
+//        }
+//        if(e.getKeyCode()==KeyEvent.VK_LEFT){
+//            Main.setSecondListGui();
+//            Main.firstListFlag =-1;
+//        }
+//        if(e.getKeyCode()==KeyEvent.VK_RIGHT||e.getKeyCode()==KeyEvent.VK_ENTER) {
+//
+//                selectionHandler();
+//
+//        }
+//        if(e.getKeyCode()==KeyEvent.VK_S||e.getKeyCode()==KeyEvent.VK_S){
+//            Main.updateDevicelink();
+//            Main.setFirstListGui();
+//            Main.firstListFlag = -2;
+//        }
+//        if(e.getKeyCode()==KeyEvent.VK_PLUS || e.getKeyCode()==KeyEvent.VK_ADD){
+//            int volume =-1;
+//            try {
+//                volume = sonos.getGroupVolume(0);
+//                sonos.setGroupVolume(volume+5);
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
+//        }
+//        if(e.getKeyCode()==KeyEvent.VK_MINUS || e.getKeyCode()==KeyEvent.VK_SUBTRACT){
+//            int volume =-1;
+//            try {
+//                volume = sonos.getGroupVolume(0);
+//                sonos.setGroupVolume(volume-5);
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
+//        }
+    }
+    private void setGroupVolume(int i ) throws IOException {
+        volume = volume +i;
+        if(!sonos.setGroupVolume(volume)){
+            if(volume>99){
+                volume=99;
+            }
+            if(volume<0){
+                volume=0;
+            }
         }
+
     }
     private static void screenhandler(){
         System.out.println("screen timer reset");
 //        if(Main.ScreenPin.isLow()) {
         if(Main.Pi4jActive) {
             Main.wifiOn();
-            Main.ScreenPin.low();
+            if(Main.ScreenPin.isHigh()) {
+                Main.ScreenPin.low();
+            }
             Main.screenTimer.restart();
         }
 //        }else{

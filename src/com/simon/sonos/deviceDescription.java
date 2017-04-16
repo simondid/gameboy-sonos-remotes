@@ -11,6 +11,9 @@ public class deviceDescription {
         this.name = name;
         this.CurrentZoneGroupID = CurrentZoneGroupID;
     }
+public void print(){
+    System.out.println("Device description : ip="+ip+" name="+name+" CurrentZoneGroupID="+CurrentZoneGroupID);
+}
 
     public String getIp() {
         return ip;

@@ -21,23 +21,23 @@ class browseItem {
 
 
 
-public void print(){
-    System.out.println("Number Returned : "+numberReturned);
-    System.out.println("Total matches : "+TotalMatches);
-    System.out.println("update id : "+updateID);
-    System.out.println("Result : "+result);
-    System.out.println("");
-    for (int i =0;i<tracks.size();i++){
-        System.out.println("item id : "+tracks.get(i).itemID);
-        System.out.println("parent id : "+tracks.get(i).parentID);
-        System.out.println("Name : "+tracks.get(i).name);
-        System.out.println("Creator : "+tracks.get(i).creator);
-        System.out.println("Album : "+tracks.get(i).album);
-        System.out.println("Duratition : "+tracks.get(i).duration);
-
+    public void print(){
+        System.out.println("Number Returned : "+numberReturned);
+        System.out.println("Total matches : "+TotalMatches);
+        System.out.println("update id : "+updateID);
+        System.out.println("Result : "+result);
         System.out.println("");
+        for (int i =0;i<tracks.size();i++){
+            System.out.println("item id : "+tracks.get(i).itemID);
+            System.out.println("parent id : "+tracks.get(i).parentID);
+            System.out.println("Name : "+tracks.get(i).name);
+            System.out.println("Creator : "+tracks.get(i).creator);
+            System.out.println("Album : "+tracks.get(i).album);
+            System.out.println("Duratition : "+tracks.get(i).duration);
+
+            System.out.println("");
+        }
     }
-}
 
 }
 
@@ -45,21 +45,21 @@ class trackData{
     String name,creator,album,enqueuedURI,itemID,parentID;
     String duration;
     public static trackData analyse(String item){
-     trackData data = new trackData();
+        trackData data = new trackData();
 
 
-     return data;
+        return data;
     }
     public void print(){
 
-            System.out.println("item id : "+itemID);
-            System.out.println("parent id : "+parentID);
-            System.out.println("Name : "+name);
-            System.out.println("Creator : "+creator);
-            System.out.println("Album : "+album);
-            System.out.println("Duratition : "+duration);
+        System.out.println("item id : "+itemID);
+        System.out.println("parent id : "+parentID);
+        System.out.println("Name : "+name);
+        System.out.println("Creator : "+creator);
+        System.out.println("Album : "+album);
+        System.out.println("Duratition : "+duration);
 
-            System.out.println("");
+        System.out.println("");
 
     }
     public void track(String name,String creator,String album,String duration,String enqueuedURI,String itemID,String parentID) {
@@ -313,18 +313,18 @@ public class Sonos {
                     }
 
                     //System.out.println(i);
-                   // System.out.println(active);
+                    // System.out.println(active);
                     result = result.replace(active, "");
                     item item = new item(name, containerId, parentId, protocolInfo, upnpalbumArtURI, upnpClass, uri, creator, album);
-                   // item.print();
+                    // item.print();
                     list.add(item);
                 }
             }
-        if(list.size()!=matchesCount){
+            if(list.size()!=matchesCount){
                 maxSize++;
                 StartingIndex=list.size();
 
-        }
+            }
         }
         System.out.println("return size : " + list.size());
         return list;
@@ -353,7 +353,7 @@ public class Sonos {
         data.updateID = input.updateID;
         data.TotalMatches = input.TotalMatches;
 
-         result = result.replace(result.substring(0,result.indexOf("<container")),"");
+        result = result.replace(result.substring(0,result.indexOf("<container")),"");
         String name,containerId,parentId;
         for(int i =0;i<input.numberReturned;i++){
             name = "";
@@ -364,16 +364,16 @@ public class Sonos {
             int i2 = result.indexOf("</container>") + "</container>".length();
             String active = result.substring(i1, i2);
 
-             i1 = active.indexOf("<dc:title>") + "<dc:title>".length();
-             i2 = active.indexOf("</dc:title>");
+            i1 = active.indexOf("<dc:title>") + "<dc:title>".length();
+            i2 = active.indexOf("</dc:title>");
             if (i1 != -1 && i2 != -1) {
                 name = active.substring(i1, i2);
             } else {
                 name = "null";
             }
 
-             i1 = active.indexOf("<container id=\"") + "<container id=\"".length();
-             i2 = active.indexOf("\"",i1);
+            i1 = active.indexOf("<container id=\"") + "<container id=\"".length();
+            i2 = active.indexOf("\"",i1);
             if (i1 != -1 && i2 != -1) {
                 containerId = active.substring(i1, i2);
             } else {
@@ -503,7 +503,7 @@ public class Sonos {
             System.out.println("ERROR !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! meta data is unhandled!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
 */
-       // data.print();
+        // data.print();
     }
 
     public static ArrayList<item> BrowseQueue(int QueueID, int StartingIndex, int RequestedCount) throws IOException,SocketException {
@@ -1075,6 +1075,50 @@ public class Sonos {
         }
 //        System.out.println(oneResponse);
     }
+    public static int getGroupVolume(int instance) throws IOException {
+        System.out.println
+                (new Exception().getStackTrace()[0].getMethodName());
+
+            URL url = new URL("http://" + ipAdress + ":1400/MediaRenderer/GroupRenderingControl/Control");
+
+            HttpURLConnection request = (HttpURLConnection) url.openConnection();
+
+            request.setRequestMethod("POST");
+//        request.addRequestProperty("SOAPACTION", "\"urn:schemas-upnp-org:service:ContentDirectory:1#Browse\"");
+            request.addRequestProperty("SOAPACTION", "\"urn:schemas-upnp-org:service:GroupRenderingControl:1#GetGroupVolume\"");
+            request.setDoOutput(true);
+            request.setReadTimeout(2000);
+
+
+
+            OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
+
+            input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                    "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                    "   <s:Body>\n" +
+                    "      <u:GetGroupVolume xmlns:u=\"urn:schemas-upnp-org:service:GroupRenderingControl:1\">\n" +
+                    "         <InstanceID>"+instance +"</InstanceID>\n" +
+                    "      </u:GetGroupVolume>\n" +
+                    "   </s:Body>\n" +
+                    "</s:Envelope>");
+            input.write("");
+
+
+
+            input.flush();
+
+
+            BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+            String oneResponse = new String();
+            String line;
+            while ((line = output.readLine()) != null) {
+                oneResponse += line + "\r\n";
+            }
+
+//            System.out.println(oneResponse);
+            return Integer.parseInt(oneResponse.substring(oneResponse.indexOf("<CurrentVolume>")+"<CurrentVolume>".length(),oneResponse.indexOf("</CurrentVolume>")));
+
+    }
     public static boolean setGroupVolume(int volume) throws IOException {
         System.out.println
                 (new Exception().getStackTrace()[0].getMethodName());
@@ -1120,7 +1164,7 @@ public class Sonos {
 
 
         }else{
-            System.out.println("error volume level out off bounds ");
+            System.out.println("error volume level out off bounds :" +volume);
             return false;
         }
         return true;
@@ -1141,47 +1185,47 @@ public class Sonos {
 
 
 
-            OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
+        OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
 
-            input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-            input.write("<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">");
-            input.write("   <s:Body>");
-            input.write("   <u:GetTransportInfo xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\">");
-            input.write(" <InstanceID>0</InstanceID>");
-            input.write("   </u:GetTransportInfo>");
-            input.write("  </s:Body>");
-            input.write("</s:Envelope>");
+        input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+        input.write("<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">");
+        input.write("   <s:Body>");
+        input.write("   <u:GetTransportInfo xmlns:u=\"urn:schemas-upnp-org:service:AVTransport:1\">");
+        input.write(" <InstanceID>0</InstanceID>");
+        input.write("   </u:GetTransportInfo>");
+        input.write("  </s:Body>");
+        input.write("</s:Envelope>");
 
-            input.flush();
+        input.flush();
 
 
-            BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
-            String oneResponse1 = new String();
-            String line;
-            while ((line = output.readLine()) != null) {
-                oneResponse1 += line + "\r\n";
-            }
+        BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+        String oneResponse1 = new String();
+        String line;
+        while ((line = output.readLine()) != null) {
+            oneResponse1 += line + "\r\n";
+        }
 
-            String oneResponse = oneResponse1;
+        String oneResponse = oneResponse1;
 
-            if (oneResponse.contains("<CurrentTransportState>")) {
-                oneResponse = oneResponse.substring(oneResponse.indexOf("<CurrentTransportState>") + "<CurrentTransportState>".length());
-                oneResponse = oneResponse.substring(0, oneResponse.indexOf("</CurrentTransportState>"));
+        if (oneResponse.contains("<CurrentTransportState>")) {
+            oneResponse = oneResponse.substring(oneResponse.indexOf("<CurrentTransportState>") + "<CurrentTransportState>".length());
+            oneResponse = oneResponse.substring(0, oneResponse.indexOf("</CurrentTransportState>"));
 
-                switch (oneResponse) {
+            switch (oneResponse) {
 
-                    case "PLAYING":
+                case "PLAYING":
 
 //                        System.out.println(oneResponse);
 //                        System.out.println(oneResponse1);
 
-                        return true;
-                    case "PAUSED_PLAYBACK":
-                        return false;
+                    return true;
+                case "PAUSED_PLAYBACK":
+                    return false;
 
 
-                }
             }
+        }
 
         return false;
     }
@@ -1350,4 +1394,53 @@ public class Sonos {
 //        }
 //        return info;
 //    }
+
+    public static deviceDescription getZoneGroupAttributes(String ipAdress) throws IOException {
+        System.out.println
+                (new Exception().getStackTrace()[0].getMethodName());
+
+        URL url = new URL("http://" + ipAdress + ":1400/ZoneGroupTopology/Control");
+        HttpURLConnection request = (HttpURLConnection) url.openConnection();
+
+        request.setRequestMethod("POST");
+        request.addRequestProperty("SOAPACTION", "\"urn:schemas-upnp-org:service:ZoneGroupTopology:1#GetZoneGroupAttributes\"");
+        request.setDoOutput(true);
+        request.setReadTimeout(500);
+
+
+        OutputStreamWriter input = new OutputStreamWriter(request.getOutputStream());
+
+        input.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<s:Envelope s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">\n" +
+                "   <s:Body>\n" +
+                "      <u:GetZoneGroupAttributes xmlns:u=\"urn:schemas-upnp-org:service:ZoneGroupTopology:1\" />\n" +
+                "   </s:Body>\n" +
+                "</s:Envelope>" +
+                "</s:Envelope>");
+        input.write("");
+
+
+
+        input.flush();
+
+
+        BufferedReader output = new BufferedReader(new InputStreamReader(request.getInputStream(), "UTF-8"));
+        String oneResponse = new String();
+        String line;
+        while ((line = output.readLine()) != null) {
+            oneResponse += line + "\r\n";
+        }
+        System.out.println(oneResponse);
+        String name = oneResponse.substring(oneResponse.indexOf("<CurrentZoneGroupName>")+"<CurrentZoneGroupName>".length(),oneResponse.indexOf("</CurrentZoneGroupName>"));
+        String CurrentZoneGroupID = oneResponse.substring(oneResponse.indexOf("<CurrentZoneGroupID>")+"<CurrentZoneGroupID>".length(),oneResponse.indexOf("</CurrentZoneGroupID>"));
+
+       ////////////////////needs to be test with multiple sonos devices on same network////////////////////////////////
+        String CurrentZonePlayerUUIDsInGroup = oneResponse.substring(oneResponse.indexOf("<CurrentZonePlayerUUIDsInGroup>")+"<CurrentZonePlayerUUIDsInGroup>".length(),oneResponse.indexOf("</CurrentZonePlayerUUIDsInGroup>"));
+       ///////////////////////////////////////////////////
+
+
+        return new deviceDescription(ipAdress ,name,CurrentZoneGroupID);
+
+
+    }
 }

@@ -4,34 +4,25 @@ package com.simon;
 import com.pi4j.io.gpio.*;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-import com.pi4j.io.gpio.trigger.GpioCallbackTrigger;
-import com.pi4j.io.gpio.trigger.GpioSetStateTrigger;
-import com.pi4j.io.gpio.trigger.GpioTrigger;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.system.SystemInfo;
+import com.pi4j.wiringpi.GpioUtil;
 import com.simon.max1704x_lipo_gauge.max17043;
 import com.simon.sonos.*;
 import com.simon.spotify.*;
 
-import com.simon.ui2.InfoPanel;
 import com.simon.ui2.frame;
 
-import javax.sound.midi.Soundbank;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.concurrent.Callable;
 
 public class Main {
     public static String ipAddress = "";
@@ -61,7 +52,9 @@ public class Main {
     public static ArrayList<Timer> timers;
     public static boolean wifiManager=false;
     public static Thread DeviceLisenter;
+
     public static void main(String[] args) throws InterruptedException {
+
         timers = new ArrayList<>();
 //            Shutdown shutdown = new Shutdown();
         try {
@@ -144,15 +137,6 @@ public class Main {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if(Pi4jActive) {
-            try {
-                new VolumeControle();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (I2CFactory.UnsupportedBusNumberException e) {
-                e.printStackTrace();
-            }
-        }
 
             screenTimer = new Timer(60000, new ActionListener() {
                 @Override
@@ -178,7 +162,15 @@ public class Main {
                 pi4jSetup();
                 LowPowerCalls.turnOffOnbordLeds();
 
+                GpioUtil.enableNonPrivilegedAccess();
 
+                try {
+                    new VolumeControle(Pi4jActive);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (I2CFactory.UnsupportedBusNumberException e) {
+                    e.printStackTrace();
+                }
             }
 
 
@@ -199,6 +191,13 @@ public class Main {
                     ArrayList<deviceDescription> list = discover.getDevices();
                     for(int i =0;i<list.size();i++){
                         System.out.println("returned stuff : "+list.get(i).getIp());
+                        if(list.get(i).getName()==null){
+                            try {
+                                list.set(i, Sonos.getZoneGroupAttributes(list.get(i).getIp()));
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         setNewGuiListDevices(list);
                     }
                     try {
@@ -210,8 +209,15 @@ public class Main {
                 ArrayList<deviceDescription> list = discover.getDevices();
                 for(int i =0;i<list.size();i++){
                     System.out.println("returned stuff : "+list.get(i).getIp());
-                    setNewGuiListDevices(list);
+                    if(list.get(i).getName()==null){
+                        try {
+                            list.set(i, Sonos.getZoneGroupAttributes(list.get(i).getIp()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 }
+                setNewGuiListDevices(list);
                 gui.Infopanel.LoadingIconOFF();
             }
 
@@ -586,9 +592,13 @@ public class Main {
             @Override
             public void run() {
                 if(itemList!=null) {
+
                     String[] newlist = new String[itemList.size()];
                     for (int i = 0; i < itemList.size(); i++) {
-                        newlist[i] = itemList.get(i).ip;
+
+
+                            newlist[i] = itemList.get(i).getIp() + " - " + itemList.get(i).getName();
+
                     }
                     deviceList = itemList;
                     frame.newList(newlist);

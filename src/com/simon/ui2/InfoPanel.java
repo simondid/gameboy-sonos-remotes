@@ -268,11 +268,18 @@ public class InfoPanel extends JPanel {
         return false;
     }
     public int timeformatToInt(String time){
-        String[] units = time.split(":"); //will break the string up into an array
-        int houres = Integer.parseInt(units[0]); //first element
-        int minutes = Integer.parseInt(units[1]); //first element
-        int seconds = Integer.parseInt(units[2]); //second element
-       return houres*3600+60 * minutes + seconds; //add up our values
+
+        try {
+            String[] units = time.split(":"); //will break the string up into an array
+            int houres = Integer.parseInt(units[0]); //first element
+            int minutes = Integer.parseInt(units[1]); //first element
+            int seconds = Integer.parseInt(units[2]); //second element
+            return houres*3600+60 * minutes + seconds; //add up our values
+        }catch (NumberFormatException e){
+            e.printStackTrace();
+        }
+        return -1;
+
     }
     volatile boolean isPlaying = true;
     public void updatInfoPanel(item input) {
@@ -334,18 +341,33 @@ public class InfoPanel extends JPanel {
                 Sonos s = new Sonos(Main.ipAddress);
 
                 Sonos.posisitionInfo data = s.getPosistionInfo();
-                if (data != null) {
+                if (data != null && Main.queuePreBuf.size()!=0 && !data.Duratation.equals("0:00:00") && !data.Duratation.equals("NOT_IMPLEMENTED") && !data.RelTime.equals("NOT_IMPLEMENTED")) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            pb.setMaximum(timeformatToInt(data.Duratation));
-                            pb.setValue(timeformatToInt(data.RelTime));
+                                pb.setMaximum(timeformatToInt(data.Duratation));
+
+                                pb.setValue(timeformatToInt(data.RelTime));
+                                
 //                    pb.setString(Main.activeList.get(data.track).title);
                             title.setText(Main.queuePreBuf.get(data.track - 1).title);
                             updatInfoPanel(Main.queuePreBuf.get(data.track - 1));
                         }
                     });
+                }else if(data !=null){
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(data.Duratation.equals("NOT_IMPLEMENTED")|| data.Duratation.equals("0:00:00")){
+                                pb.setMaximum(100);
+                                pb.setValue(100);
+
+                                title.setText("TV ore Radio");
+                            }
+                        }
+                    });
                 }
+
             }
             return null;
         }

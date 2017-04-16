@@ -1,6 +1,5 @@
 #gameboy zero w sonos controler
 
-bramches test
 
 ## Interface
 ![alt text](http://i67.tinypic.com/28bbcra.png "Logo Title Text 1")
@@ -143,6 +142,15 @@ https://github.com/simondid/MAX17043
 
 
 ![battery circuit](http://i65.tinypic.com/xdf0wi.png "battery circuit")
+
+### volume controle
+this i based on a pot meter and uses a ads1115 adc to convert the input signal
+
+known bugs
+minus volume fires twice
+
+schematic coming
+
 
 
 # optional
