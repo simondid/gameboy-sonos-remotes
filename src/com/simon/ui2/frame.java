@@ -18,6 +18,9 @@ public class frame extends JFrame {
     public InfoPanel Infopanel;
     public static listPanel listPanel;
     GraphicsEnvironment e;
+
+
+
     public frame(boolean fullscreen) throws HeadlessException {
       //  super("title");
 

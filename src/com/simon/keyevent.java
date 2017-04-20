@@ -27,6 +27,11 @@ public class keyevent implements KeyListener {
     Timer VolLevelChangeTimer;
     int volume =-1;
     public keyevent() {
+//        try {
+//            volume = sonos.getGroupVolume(0);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -53,11 +58,7 @@ public class keyevent implements KeyListener {
             }
         });
         VolLevelChangeTimer.setRepeats(false);
-
-
-
-
-
+        Main.timers.add(VolLevelChangeTimer);
 
         switch (e.getKeyCode()){
             case KeyEvent.VK_C:
@@ -118,7 +119,8 @@ public class keyevent implements KeyListener {
 
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                }                break;
+                }
+                break;
             case KeyEvent.VK_MINUS:
                 try {
 
@@ -127,7 +129,7 @@ public class keyevent implements KeyListener {
 
                     }else{
 
-                        volume = sonos.getGroupVolume(0)-2;
+                        volume = sonos.getGroupVolume(0)-5;
                         sonos.setGroupVolume(volume);
                         VolLeverTimer=true;
                         VolLevelChangeTimer.start();
@@ -136,6 +138,7 @@ public class keyevent implements KeyListener {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                break;
                 case KeyEvent.VK_SUBTRACT:
                     try {
 
@@ -144,7 +147,7 @@ public class keyevent implements KeyListener {
 
                         }else{
 
-                            volume = sonos.getGroupVolume(0)-2;
+                            volume = sonos.getGroupVolume(0)-5;
                             sonos.setGroupVolume(volume);
                             VolLeverTimer=true;
                             VolLevelChangeTimer.start();

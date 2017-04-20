@@ -52,6 +52,8 @@ public class Main {
     public static ArrayList<Timer> timers;
     public static boolean wifiManager=false;
     public static Thread DeviceLisenter;
+    public static ADS1115Controler ads1115Controler;
+    public static volatile boolean isCharing = false;
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -110,6 +112,11 @@ public class Main {
                 SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
                 System.out.println("time : " + sdf.format(cal.getTime()));
 
+                if(ads1115Controler!=null){
+                    isCharing =ads1115Controler.isCharing;
+
+                }
+
             }
         });
         timers.add(timer);
@@ -164,13 +171,14 @@ public class Main {
 
                 GpioUtil.enableNonPrivilegedAccess();
 
-                try {
-                    new VolumeControle(Pi4jActive);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (I2CFactory.UnsupportedBusNumberException e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        ads1115Controler = new ADS1115Controler();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (I2CFactory.UnsupportedBusNumberException e) {
+                        e.printStackTrace();
+                    }
+
             }
 
 
@@ -277,6 +285,18 @@ public class Main {
 
         gpio = instance;
 
+
+
+        pi4jButtonLeftSetup(); // gpio 02
+        pi4jButtonRightSetup(); // gpio 00
+        pi4jButtonUpSetup(); // gpio 10
+        pi4jButtonDownSetup(); // gpio 04
+        pi4jButtonASetup(); //gpio 06
+        pi4jButtonBSetup(); // gpio 5
+        pi4jButtonStartSetup(); // gpio 11
+        pi4jButtonSelectSetup(); // gpio 07
+        pi4jScreenControler(); // gpio 8 and 9
+
         try {
             max17043 max = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
             max.clearAlertInterrupt();
@@ -291,18 +311,6 @@ public class Main {
         }
 
 
-        pi4jButtonLeftSetup(); // gpio 02
-        pi4jButtonRightSetup(); // gpio 00
-        pi4jButtonUpSetup(); // gpio 10
-        pi4jButtonDownSetup(); // gpio 04
-        pi4jButtonASetup(); //gpio 06
-        pi4jButtonBSetup(); // gpio 5
-        pi4jButtonStartSetup(); // gpio 11
-        pi4jButtonSelectSetup(); // gpio 07
-        pi4jScreenControler(); // gpio 8 and 9
-
-
-
     }
 
     public static void screenToogle(){
@@ -312,6 +320,7 @@ public class Main {
     private static void pi4jScreenControler() {
        ScreenPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_01);
        ScreenPin.setShutdownOptions(true,PinState.LOW);
+        System.out.println("screen pin set");
     }
 
     public static void pi4jButtonSelectSetup(){
@@ -675,6 +684,7 @@ public class Main {
         Main.ipAddress = ip;
         gui.Infopanel.LoadingIconON();
         sonos = new Sonos(ipAddress);
+
         preBuf();
 
     }

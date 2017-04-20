@@ -146,9 +146,6 @@ https://github.com/simondid/MAX17043
 ### volume controle
 this i based on a pot meter and uses a ads1115 adc to convert the input signal
 
-known bugs
-minus volume fires twice
-
 schematic coming
 
 

@@ -35,6 +35,8 @@ public class InfoPanel extends JPanel {
     JLabel Battery;
     Timer t;
 //    GpioController gpio;
+    public static boolean isCharing = false;
+
     private volatile static max17043 max;
     public static NumberFormat format = new DecimalFormat("#0.00");
     volatile double soc;
@@ -136,6 +138,8 @@ public class InfoPanel extends JPanel {
 //                if(Main.ScreenPin.isHigh()){
 //                    System.out.println("scrren pin is high1");
 //                }
+
+
                 if (state) {
 
                     //  if (Main.sonos.getTransportInfo()) {
@@ -200,43 +204,56 @@ public class InfoPanel extends JPanel {
                         public void run() {
                             double d =-1.0;
                             if (Main.Pi4jActive) {
-                                System.out.println("screen pin : " +Main.ScreenPin.getState());
-                                if(Main.ScreenPin.getState()==PinState.LOW) {
-                                try {
-
-                                        max17043 cp = null;
+                                System.out.println("ischaring state 1:"+Main.isCharing);
+                                if(!Main.isCharing) {
+                                    System.out.println("screen pin : " + Main.ScreenPin.getState());
+                                    if (Main.ScreenPin.getState() == PinState.LOW) {
                                         try {
-                                            cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
-                                        } catch (I2CFactory.UnsupportedBusNumberException e1) {
-                                            e1.printStackTrace();
-                                        }
 
-                                        d = soc = cp.getSOC();
-                                        if (cp.getAlertTriggered()) {
-                                            Main.shutdown();
-                                        }
+                                            max17043 cp = null;
+                                            try {
+                                                cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
+                                            } catch (IOException e1) {
+                                                e1.printStackTrace();
+                                            } catch (I2CFactory.UnsupportedBusNumberException e1) {
+                                                e1.printStackTrace();
+                                            }
+
+                                            d = soc = cp.getSOC();
+                                            if (cp.getAlertTriggered()) {
+                                                Main.shutdown();
+                                            }
 
 //                                    System.out.println("SOC : " + d);
-                                    double finalD = d;
+                                            double finalD = d;
+                                            SwingUtilities.invokeLater(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Calendar cal = Calendar.getInstance();
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+//                                            System.out.println( "time : "+sdf.format(cal.getTime()) );
+
+                                                    Battery.setText(format.format(finalD) + "%");
+                                                    System.out.println("updaing battery state SOC = " + format.format(soc) + " ; " + sdf.format(cal.getTime()));
+                                                }
+                                            });
+
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        } catch (InterruptedException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                }else{
+
                                     SwingUtilities.invokeLater(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Calendar cal = Calendar.getInstance();
-                                            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-//                                            System.out.println( "time : "+sdf.format(cal.getTime()) );
-
-                                            Battery.setText(format.format(finalD) + "%");
-                                            System.out.println("updaing battery state SOC = " + format.format(soc) + " ; " + sdf.format(cal.getTime()));
+                                            Battery.setText("CHARING");
                                         }
                                     });
 
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                } catch (InterruptedException e1) {
-                                    e1.printStackTrace();
-                                }
+
                                 }
                             }else {
                                 Battery.setText("N/A");
