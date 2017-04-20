@@ -143,9 +143,10 @@ https://github.com/simondid/MAX17043
 
 ![battery circuit](http://i65.tinypic.com/xdf0wi.png "battery circuit")
 
-### volume controle
-this i based on a pot meter and uses a ads1115 adc to convert the input signal
+### ADC implementation /volume controle
+this i based on a pot meter and uses a ads1115 adc to convert the input signal for volume controle and demtermination if the powerboost is charing
 
+do not connect ads1115 vdd to +5v ( is wil make the powerboost usb pin back feed into the system )
 schematic coming
 
 
