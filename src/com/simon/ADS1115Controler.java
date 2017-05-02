@@ -25,6 +25,8 @@ public class ADS1115Controler {
     String pin2 = "MyAnalogInput-A2";
     String pin3 = "MyAnalogInput-A3";
     Sonos sonos;
+    GpioPinListenerAnalog listener;
+    GpioPinAnalogInput myInputs[];
     private double inputVoltage =ADS1115GpioProvider.ADS1115_RANGE_MAX_VALUE;
     public boolean isCharing = false;
     public ADS1115Controler()  throws IOException, I2CFactory.UnsupportedBusNumberException{{
@@ -45,7 +47,7 @@ public class ADS1115Controler {
         final ADS1115GpioProvider gpioProvider = new ADS1115GpioProvider(I2CBus.BUS_1, ADS1115GpioProvider.ADS1115_ADDRESS_0x48);
 
         // provision gpio analog input pins from ADS1115
-        GpioPinAnalogInput myInputs[] = {
+        myInputs = new GpioPinAnalogInput[]{
                 gpio.provisionAnalogInputPin(gpioProvider, ADS1115Pin.INPUT_A0, pin0),
                 gpio.provisionAnalogInputPin(gpioProvider, ADS1115Pin.INPUT_A1, pin1),
                 gpio.provisionAnalogInputPin(gpioProvider, ADS1115Pin.INPUT_A2, pin2),
@@ -101,7 +103,7 @@ public class ADS1115Controler {
         System.out.println("ADS init values : isCharing =" +isCharing + " inputVoltageRAW ="+inputVoltage+ " inputVoltage =" +voltage);
 
         // create analog pin value change listener
-        GpioPinListenerAnalog listener = new GpioPinListenerAnalog()
+        listener = new GpioPinListenerAnalog()
         {
             @Override
             public void handleGpioPinAnalogValueChangeEvent(GpioPinAnalogValueChangeEvent event)
@@ -193,6 +195,16 @@ public class ADS1115Controler {
         System.out.println("Exiting ADS1115GpioExample");
     }
 
+    }
+    public void disable(){
+        for (int i =0;i<myInputs.length;i++){
+            myInputs[i].removeAllListeners();
+        }
+    }
+    public void enable(){
+        for (int i =0;i<myInputs.length;i++){
+            myInputs[i].addListener(listener);
+        }
     }
     public static void RampAudio(int vol,int target){
         System.out.println("ramping audio current volume :"+vol + " target audio :"+target);

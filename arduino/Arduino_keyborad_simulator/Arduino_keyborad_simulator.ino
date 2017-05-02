@@ -1,5 +1,7 @@
 
-#include <Bounce.h>
+#include <Bounce2.h>
+#include <Keyboard.h>
+
 
 #define NUM_KEYS 12
 

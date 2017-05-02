@@ -147,7 +147,13 @@ https://github.com/simondid/MAX17043
 this i based on a pot meter and uses a ads1115 adc to convert the input signal for volume controle and demtermination if the powerboost is charing
 
 do not connect ads1115 vdd to +5v ( is wil make the powerboost usb pin back feed into the system )
+
+the code behind adc controler is a bit buggy so fast pot meter changes might result in volume jumps / missed volume changes
+
 schematic coming
+
+### easy eda drawing (work in progress)
+https://easyeda.com/simondid/gameboy_zero-98c04ba514d84fc888e9045b872c0070
 
 
 

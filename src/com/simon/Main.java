@@ -43,7 +43,7 @@ public class Main {
     public static GpioPinDigitalInput ButtonLeft, ButtonRight, ButtonUp, ButtonDown, ButtonA, ButtonB, ButtonSelect, ButtonStart;
     public static GpioPinDigitalOutput ScreenPin;
     public static GpioController gpio;
-    public static boolean fullscreen = false;
+    public static boolean fullscreen = true;
     public static int debounceTime = 500;
     public static Timer screenTimer;
     public static boolean Pi4jActive = false;
@@ -150,6 +150,7 @@ public class Main {
                 public void actionPerformed(ActionEvent e) {
                     if (Pi4jActive){
                         ScreenPin.high();
+                        ads1115Controler.disable();
                     try {
                         Thread.sleep(10000);
                     } catch (InterruptedException e1) {

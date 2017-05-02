@@ -220,9 +220,10 @@ public class keyevent implements KeyListener {
             Main.wifiOn();
             if(Main.ScreenPin.isHigh()) {
                 Main.ScreenPin.low();
+                Main.ads1115Controler.enable();
             }
-            Main.screenTimer.restart();
         }
+        Main.screenTimer.restart();
 //        }else{
 //            Main.ScreenPin.low();
 //        }

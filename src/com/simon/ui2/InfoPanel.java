@@ -207,22 +207,24 @@ public class InfoPanel extends JPanel {
                                 System.out.println("ischaring state 1:"+Main.isCharing);
                                 if(!Main.isCharing) {
                                     System.out.println("screen pin : " + Main.ScreenPin.getState());
+                                    max17043 cp = null;
+                                    try {
+                                        cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
+                                        d = soc = cp.getSOC();
+                                        if (cp.getAlertTriggered()) {
+                                            Main.shutdown();
+                                        }
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    } catch (I2CFactory.UnsupportedBusNumberException e1) {
+                                        e1.printStackTrace();
+                                    } catch (InterruptedException e1) {
+                                        e1.printStackTrace();
+                                    }
+
+
                                     if (Main.ScreenPin.getState() == PinState.LOW) {
-                                        try {
 
-                                            max17043 cp = null;
-                                            try {
-                                                cp = new max17043(I2CFactory.getInstance(I2CBus.BUS_1));
-                                            } catch (IOException e1) {
-                                                e1.printStackTrace();
-                                            } catch (I2CFactory.UnsupportedBusNumberException e1) {
-                                                e1.printStackTrace();
-                                            }
-
-                                            d = soc = cp.getSOC();
-                                            if (cp.getAlertTriggered()) {
-                                                Main.shutdown();
-                                            }
 
 //                                    System.out.println("SOC : " + d);
                                             double finalD = d;
@@ -237,12 +239,6 @@ public class InfoPanel extends JPanel {
                                                     System.out.println("updaing battery state SOC = " + format.format(soc) + " ; " + sdf.format(cal.getTime()));
                                                 }
                                             });
-
-                                        } catch (IOException e1) {
-                                            e1.printStackTrace();
-                                        } catch (InterruptedException e1) {
-                                            e1.printStackTrace();
-                                        }
                                     }
                                 }else{
 
