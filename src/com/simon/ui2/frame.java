@@ -73,7 +73,7 @@ public class frame extends JFrame {
 
 
     }
-    public static int popup(JFrame f){
+    public static int popupSpotify(JFrame f){
         System.out.println
                 (new Exception().getStackTrace()[0].getMethodName());
         UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
@@ -87,6 +87,33 @@ public class frame extends JFrame {
         int n = JOptionPane.showOptionDialog(f,
                 "what to do with playlist",
                 "play list handling",
+                JOptionPane.YES_NO_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[2]);
+
+
+
+
+        return n;
+    }
+    public static int popupStateManager(JFrame f){
+        System.out.println
+                (new Exception().getStackTrace()[0].getMethodName());
+        UIManager.put("Button.defaultButtonFollowsFocus", Boolean.TRUE);
+        configureOptionPane();
+        Object[] options = {"Shutdown",
+                "Restart",
+                "Cancel"};
+
+
+        Object[] op = {"Shutdown",
+                "Restart",
+                "Cancel"};
+        int n = JOptionPane.showOptionDialog(f,
+                "what to do ",
+                "State Manager",
                 JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,

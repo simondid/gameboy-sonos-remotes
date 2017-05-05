@@ -5,6 +5,7 @@ import com.simon.sonos.Sonos;
 import com.simon.ui.gui2;
 import com.simon.ui2.frame;
 import com.simon.ui2.listPanel;
+import com.sun.jndi.ldap.Ber;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.text.BreakIterator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,124 +44,148 @@ public class keyevent implements KeyListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        screenhandler();
+
         Main.gui.listPanel.list.ensureIndexIsVisible(Main.gui.listPanel.list.getSelectedIndex());
 
         sonos = Main.sonos;
 
         System.out.println("keyEvent =" + e.getKeyCode());
 
+        if(!VolLevelChangeTimer.isRunning()) {
+            VolLevelChangeTimer = new Timer(30000, new ActionListener() {
 
-        VolLevelChangeTimer = new Timer(30000, new ActionListener() {
-
-            public void actionPerformed(ActionEvent e) {
-                VolLeverTimer = false;
+                public void actionPerformed(ActionEvent e) {
+                    VolLeverTimer = false;
 //                System.out.println(VolLeverTimer);
-            }
-        });
-        VolLevelChangeTimer.setRepeats(false);
-        Main.timers.add(VolLevelChangeTimer);
-
-        switch (e.getKeyCode()){
-            case KeyEvent.VK_C:
-                try {
-                    sonos.RemoveAllTracks();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
                 }
-                break;
-            case KeyEvent.VK_LEFT:
-                Main.setSecondListGui();
-                Main.firstListFlag =-1;
-                break;
-            case KeyEvent.VK_RIGHT:
-                selectionHandler();
-                break;
-            case KeyEvent.VK_ENTER:
-                selectionHandler();
-                break;
-            case KeyEvent.VK_S:
-                Main.updateDevicelink();
-                Main.setFirstListGui();
-                Main.firstListFlag = -2;
-                break;
-            case KeyEvent.VK_PLUS:
+            });
+            VolLevelChangeTimer.setRepeats(false);
+            Main.timers.add(VolLevelChangeTimer);
+        }else{
+            VolLevelChangeTimer.restart();
+        }
+        if(Main.ScreenPin.isHigh()) {
+            screenhandler();
+        }else {
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_D:
 
-                try {
+                        switch (frame.popupStateManager(Main.gui)){
+                            case 0:
+                                // shutdown
+                                Main.shutdown();
+                                break;
+                            case 1:
+                                // restart
+                               Main.reboot();
+                                break;
+                            case 2:
+                                //cancel
 
-                    if(VolLeverTimer) {
-                        setGroupVolume(5);
+                                break;
 
-                    }else{
+                        }
 
-                        volume = sonos.getGroupVolume(0)+5;
-                        sonos.setGroupVolume(volume);
-                        VolLeverTimer=true;
-                        VolLevelChangeTimer.start();
+                    break;
+                case KeyEvent.VK_C:
+                    try {
+                        sonos.RemoveAllTracks();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
+                    break;
+                case KeyEvent.VK_LEFT:
+                    Main.setSecondListGui();
+                    Main.firstListFlag = -1;
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    selectionHandler();
+                    break;
+                case KeyEvent.VK_ENTER:
+                    selectionHandler();
+                    break;
+                case KeyEvent.VK_S:
+                    Main.updateDevicelink();
+                    Main.setFirstListGui();
+                    Main.firstListFlag = -2;
+                    break;
+                case KeyEvent.VK_PLUS:
 
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                break;
-            case KeyEvent.VK_ADD:
-
-                try {
-
-                    if(VolLeverTimer) {
-                        setGroupVolume(5);
-
-                    }else{
-
-                        volume = sonos.getGroupVolume(0)+5;
-                        sonos.setGroupVolume(volume);
-                        VolLeverTimer=true;
-                        VolLevelChangeTimer.start();
-                    }
-
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                break;
-            case KeyEvent.VK_MINUS:
-                try {
-
-                    if(VolLeverTimer) {
-                        setGroupVolume(-5);
-
-                    }else{
-
-                        volume = sonos.getGroupVolume(0)-5;
-                        sonos.setGroupVolume(volume);
-                        VolLeverTimer=true;
-                        VolLevelChangeTimer.start();
-                    }
-
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                break;
-                case KeyEvent.VK_SUBTRACT:
                     try {
 
-                        if(VolLeverTimer) {
-                            setGroupVolume(-5);
+                        if (VolLeverTimer) {
+                            setGroupVolume(5);
 
-                        }else{
+                        } else {
 
-                            volume = sonos.getGroupVolume(0)-5;
+                            volume = sonos.getGroupVolume(0) + 5;
                             sonos.setGroupVolume(volume);
-                            VolLeverTimer=true;
+                            VolLeverTimer = true;
                             VolLevelChangeTimer.start();
                         }
 
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-                 break;
+                    break;
+                case KeyEvent.VK_ADD:
 
+                    try {
+
+                        if (VolLeverTimer) {
+                            setGroupVolume(5);
+
+                        } else {
+
+                            volume = sonos.getGroupVolume(0) + 5;
+                            sonos.setGroupVolume(volume);
+                            VolLeverTimer = true;
+                            VolLevelChangeTimer.start();
+                        }
+
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    break;
+                case KeyEvent.VK_MINUS:
+                    try {
+
+                        if (VolLeverTimer) {
+                            setGroupVolume(-5);
+
+                        } else {
+
+                            volume = sonos.getGroupVolume(0) - 5;
+                            sonos.setGroupVolume(volume);
+                            VolLeverTimer = true;
+                            VolLevelChangeTimer.start();
+                        }
+
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    break;
+                case KeyEvent.VK_SUBTRACT:
+                    try {
+
+                        if (VolLeverTimer) {
+                            setGroupVolume(-5);
+
+                        } else {
+
+                            volume = sonos.getGroupVolume(0) - 5;
+                            sonos.setGroupVolume(volume);
+                            VolLeverTimer = true;
+                            VolLevelChangeTimer.start();
+                        }
+
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    break;
+
+            }
         }
-
 //        if(e.getKeyCode()==KeyEvent.VK_C){
 //            try {
 //                sonos.RemoveAllTracks();
@@ -217,11 +243,12 @@ public class keyevent implements KeyListener {
         System.out.println("screen timer reset");
 //        if(Main.ScreenPin.isLow()) {
         if(Main.Pi4jActive) {
-            Main.wifiOn();
             if(Main.ScreenPin.isHigh()) {
-                Main.ScreenPin.low();
-                Main.ads1115Controler.enable();
-            }
+            Main.ScreenPin.setState(false);
+            Main.ads1115Controler.enable();
+        }
+            Main.wifiOn();
+
         }
         Main.screenTimer.restart();
 //        }else{
@@ -229,7 +256,7 @@ public class keyevent implements KeyListener {
 //        }
     }
     public static void selectionHandler(){
-        screenhandler();
+
         System.out.println("index : "+Main.gui.listPanel.list.getSelectedIndex() + " flag : "+ Main.firstListFlag);
         switch (Main.firstListFlag){
             case -2:
@@ -267,7 +294,13 @@ public class keyevent implements KeyListener {
 
                         }
                         break;
-
+                    case 4:
+                        try {
+                            sonos.Stop();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        break;
                 }
                 break;
 
@@ -305,7 +338,7 @@ public class keyevent implements KeyListener {
 
 
                 try {
-                    switch (frame.popup(Main.gui)){
+                    switch (frame.popupSpotify(Main.gui)){
                         case 0:
                             // add
                             sonos.SetPlayListAsInput();
@@ -329,6 +362,7 @@ public class keyevent implements KeyListener {
                     e1.printStackTrace();
                 }
                 break;
+
         }
 
 

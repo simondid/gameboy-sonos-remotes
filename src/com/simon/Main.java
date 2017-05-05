@@ -33,7 +33,7 @@ public class Main {
     public static ArrayList<item> activeList;
     public static ArrayList<item> queuePreBuf;
     public static ArrayList<item> SpotifyPreBuf;
-    public static String[] firstList = {"radio", "queue", "Spotify", "tv"};
+    public static String[] firstList = {"radio", "queue", "Spotify", "tv","Pause"};
     public static ArrayList<deviceDescription> deviceList;
     public static int firstListFlag = -2;
     public static Sonos sonos = null;
@@ -44,7 +44,7 @@ public class Main {
     public static GpioPinDigitalOutput ScreenPin;
     public static GpioController gpio;
     public static boolean fullscreen = true;
-    public static int debounceTime = 500;
+    public static int debounceTime = 250;
     public static Timer screenTimer;
     public static boolean Pi4jActive = false;
     public static final int defaultBatteryShutdownSOC = 3;
@@ -54,7 +54,7 @@ public class Main {
     public static Thread DeviceLisenter;
     public static ADS1115Controler ads1115Controler;
     public static volatile boolean isCharing = false;
-
+    public static Robot  robot;
     public static void main(String[] args) throws InterruptedException {
 
         timers = new ArrayList<>();
@@ -286,8 +286,16 @@ public class Main {
 
         gpio = instance;
 
-
-
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            robot = new Robot();
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
         pi4jButtonLeftSetup(); // gpio 02
         pi4jButtonRightSetup(); // gpio 00
         pi4jButtonUpSetup(); // gpio 10
@@ -325,7 +333,7 @@ public class Main {
     }
 
     public static void pi4jButtonSelectSetup(){
-        ButtonSelect = gpio.provisionDigitalInputPin(RaspiPin.GPIO_07, PinPullResistance.PULL_DOWN);
+        ButtonSelect = gpio.provisionDigitalInputPin(RaspiPin.GPIO_07, PinPullResistance.PULL_UP);
         ButtonSelect.setShutdownOptions(true);
         ButtonSelect.setDebounce(debounceTime);
         ButtonSelect.addListener(new GpioPinListenerDigital() {
@@ -334,23 +342,20 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_D);
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_D);
                     }else {
-                        r.keyRelease(KeyEvent.VK_D);
+                        robot.keyRelease(KeyEvent.VK_D);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 //
             }
 
         });
     }
     public static void pi4jButtonStartSetup(){
-        ButtonStart = gpio.provisionDigitalInputPin(RaspiPin.GPIO_11, PinPullResistance.PULL_DOWN);
+        ButtonStart = gpio.provisionDigitalInputPin(RaspiPin.GPIO_11, PinPullResistance.PULL_UP);
         ButtonStart.setShutdownOptions(true);
         ButtonStart.setDebounce(debounceTime);
         ButtonStart.addListener(new GpioPinListenerDigital() {
@@ -359,23 +364,20 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_S);
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_S);
                     }else {
-                        r.keyRelease(KeyEvent.VK_S);
+                        robot.keyRelease(KeyEvent.VK_S);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 
             }
 
         });
     }
     public static void pi4jButtonBSetup(){
-        ButtonB = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_DOWN);
+        ButtonB = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, PinPullResistance.PULL_UP);
         ButtonB.setShutdownOptions(true);
         ButtonB.setDebounce(debounceTime);
         ButtonB.addListener(new GpioPinListenerDigital() {
@@ -384,23 +386,21 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_LEFT);
+
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_LEFT);
                     }else {
-                        r.keyRelease(KeyEvent.VK_LEFT);
+                        robot.keyRelease(KeyEvent.VK_LEFT);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 
             }
 
         });
     }
     public static void pi4jButtonASetup(){
-        ButtonA = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, PinPullResistance.PULL_DOWN);
+        ButtonA = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, PinPullResistance.PULL_UP);
         ButtonA.setShutdownOptions(true);
         ButtonA.setDebounce(debounceTime);
         ButtonA.addListener(new GpioPinListenerDigital() {
@@ -409,23 +409,20 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_ENTER);
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_ENTER);
                     }else {
-                        r.keyRelease(KeyEvent.VK_ENTER);
+                        robot.keyRelease(KeyEvent.VK_ENTER);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 //
             }
 
         });
     }
     public static void pi4jButtonDownSetup(){
-        ButtonDown = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04, PinPullResistance.PULL_DOWN);
+        ButtonDown = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04, PinPullResistance.PULL_UP);
         ButtonDown.setShutdownOptions(true);
         ButtonDown.setDebounce(debounceTime);
         ButtonDown.addListener(new GpioPinListenerDigital() {
@@ -434,16 +431,14 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_DOWN);
+
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_DOWN);
                     }else {
-                        r.keyRelease(KeyEvent.VK_DOWN);
+                        robot.keyRelease(KeyEvent.VK_DOWN);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 
             }
 
@@ -451,7 +446,7 @@ public class Main {
     }
     public static void pi4jButtonUpSetup(){
 //        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_08, PinPullResistance.PULL_DOWN);
-        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_10);
+        ButtonUp = gpio.provisionDigitalInputPin(RaspiPin.GPIO_10,PinPullResistance.PULL_UP);
         ButtonUp.setShutdownOptions(true);
         ButtonUp.setDebounce(debounceTime);
         ButtonUp.addListener(new GpioPinListenerDigital() {
@@ -460,23 +455,20 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_UP);
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_UP);
                     }else {
-                        r.keyRelease(KeyEvent.VK_UP);
+                        robot.keyRelease(KeyEvent.VK_UP);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 
             }
 
         });
     }
     public static void pi4jButtonRightSetup(){
-        ButtonRight = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00, PinPullResistance.PULL_DOWN);
+        ButtonRight = gpio.provisionDigitalInputPin(RaspiPin.GPIO_00, PinPullResistance.PULL_UP);
         ButtonRight.setShutdownOptions(true);
         ButtonRight.setDebounce(debounceTime);
         ButtonRight.addListener(new GpioPinListenerDigital() {
@@ -485,23 +477,20 @@ public class Main {
             public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
                 // display pin state on console
                 System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-                try {
-                    Robot  r = new Robot();
-                    if(event.getState().isHigh()) {
-                        r.keyPress(KeyEvent.VK_RIGHT);
+
+                    if(event.getState().isLow()) {
+                        robot.keyPress(KeyEvent.VK_RIGHT);
                     }else {
-                        r.keyRelease(KeyEvent.VK_RIGHT);
+                        robot.keyRelease(KeyEvent.VK_RIGHT);
                     }
-                } catch (AWTException e) {
-                    e.printStackTrace();
-                }
+
 
             }
 
         });
     }
     public static void pi4jButtonLeftSetup(){
-        ButtonLeft = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_DOWN);
+        ButtonLeft = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, PinPullResistance.PULL_UP);
         ButtonLeft.setShutdownOptions(true);
         ButtonLeft.setDebounce(debounceTime);
 
@@ -509,16 +498,14 @@ public class Main {
         ButtonLeft.addListener((GpioPinListenerDigital) event -> {
 //                 display pin state on console
             System.out.println(" --> GPIO PIN STATE CHANGE: " + event.getPin() + " = " + event.getState());
-            try {
-                Robot  r = new Robot();
-                if(event.getState().isHigh()) {
-                    r.keyPress(KeyEvent.VK_LEFT);
+
+
+                if(event.getState().isLow()) {
+                    robot.keyPress(KeyEvent.VK_LEFT);
                 }else {
-                    r.keyRelease(KeyEvent.VK_LEFT);
+                    robot.keyRelease(KeyEvent.VK_LEFT);
                 }
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
+
 
         });
     }
@@ -645,6 +632,25 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    public static void reboot() {
+
+            try {
+                gpio.shutdown();
+
+
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                System.out.println("Rebooting");
+                System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                String[] args = new String[] {"/bin/bash", "-c", "sudo reboot"};
+                Process proc = new ProcessBuilder(args).start();
+                System.exit(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+    }
     public static void DisplatOFF(){
         try {
             String[] args = new String[] {"/bin/bash", "-c", "tvservice -o"};
@@ -715,4 +721,5 @@ public class Main {
         t.start();
 
     }
+
 }

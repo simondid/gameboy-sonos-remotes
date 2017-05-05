@@ -6,6 +6,50 @@
 
 
 ## setup
+### new auto launch
+https://www.raspberrypi.org/forums/viewforum.php?f=91
+
+Step 1: add startx to /etc/rc.local
+```sh
+sudo nano /etc/rc.local
+```
+add the following lines replace youre_user with pi ore any othere user
+
+```sh
+#/etc/rc.local
+su -s /bin/bash -c startx your_user&
+```
+
+Step 2: allow non-interactive processes to launch an X server
+
+```sh
+sudo apt-get install xserver-xorg-legacy -y
+```
+```sh
+sudo nano /etc/X11/Xwrapper.config
+```
+edit allowed_user lines to the following
+```sh
+allowed_users=anybody
+```
+save changes to Xwrapper.config
+
+
+```sh
+sudo nano /etc/X11/xinit/xinitrc
+```
+now add a # infront of the following line
+```sh
+. /etc/X11/Xsession
+```
+add the following lines
+replace youre_user with pi ore any othere user 
+and change /user/bin/gambas3 to any othere command like "sudo java -jar path"
+
+```sh
+#~your_user/.xinitrc
+/usr/bin/gambas3
+```
 
 ### running the jar
 ```sh
@@ -189,3 +233,8 @@ wifi on
 sudo iwconfig wlan0 txpower 1
 
 http://raspberrypi.stackexchange.com/questions/43720/disable-wifi-wlan0-on-pi-3
+
+
+## boot time
+boot time analyser tool
+https://www.freedesktop.org/software/systemd/man/systemd-analyze.html

@@ -32,7 +32,7 @@ public class Upnp_Discover extends Thread {
         // Let's wait 10 seconds for them to respond
 //        System.out.println("Waiting 10 seconds before shutting down...");
         try {
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
